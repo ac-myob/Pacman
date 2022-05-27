@@ -41,7 +41,7 @@ public class PacTests
     public void Move_ShouldContinuouslyQueryForKey_WhenKeyPressIsInvalid()
     {
         const string invalidKeyPress = "";
-        const string validKeyPress = "UpArrow";
+        const string validKeyPress = Constants.UpKey;
         var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
         
@@ -57,28 +57,28 @@ public class PacTests
         yield return new object[]
         {
             new Coordinate(1, 1),
-            "UpArrow",
+            Constants.UpKey,
             new Coordinate(1, 0)
         };
         
         yield return new object[]
         {
             new Coordinate(1, 1),
-            "DownArrow",
+            Constants.DownKey,
             new Coordinate(1, 2)
         };
         
         yield return new object[]
         {
             new Coordinate(1, 1),
-            "LeftArrow",
+            Constants.LeftKey,
             new Coordinate(0, 1)
         };
         
         yield return new object[]
         {
             new Coordinate(1, 1),
-            "RightArrow",
+            Constants.RightKey,
             new Coordinate(2, 1)
         };
     }
@@ -89,7 +89,7 @@ public class PacTests
         {
             new Coordinate(0, 0),
             new Size(2, 2),
-            "UpArrow",
+            Constants.UpKey,
             new Coordinate(0, 1)
         };
         
@@ -97,7 +97,7 @@ public class PacTests
         {
             new Coordinate(1, 1),
             new Size(2, 2),
-            "DownArrow",
+            Constants.DownKey,
             new Coordinate(1, 0)
         };
         
@@ -105,7 +105,7 @@ public class PacTests
         {
             new Coordinate(0, 0),
             new Size(2, 2),
-            "LeftArrow",
+            Constants.LeftKey,
             new Coordinate(1, 0)
         };
         
@@ -113,7 +113,7 @@ public class PacTests
         {
             new Coordinate(1, 1),
             new Size(2, 2),
-            "RightArrow",
+            Constants.RightKey,
             new Coordinate(0, 1)
         };
     }
