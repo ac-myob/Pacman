@@ -15,33 +15,35 @@ public class Pac : MovableEntity
         _writer = writer;
     }
     
-    public override void Move(Size size, IEnumerable<Entity> walls)
+    public override void Move(Size size, IEnumerable<Entity> obstacles)
     {
-        var (x, y) = Coordinate;
-        var (width, length) = size;
-        var wallsArr = walls.ToArray();
-
+        var obstaclesArr = obstacles.ToArray();
+        bool blockedByWall;
         Coordinate newCoord;
-        bool validNewCoord;
         
         do
         {
             var keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
-            newCoord = keyPress switch
-            {
-                Constants.UpKey => new Coordinate(x, Utilities.Mod(y - 1, length)),
-                Constants.DownKey => new Coordinate(x, Utilities.Mod(y + 1, length)),
-                Constants.LeftKey => new Coordinate(Utilities.Mod(x - 1, width), y),
-                Constants.RightKey => new Coordinate(Utilities.Mod(x + 1, width), y),
-                _ => Coordinate
-            };
+            var chosenDirection = _getDirection(keyPress);
+            newCoord = GetNewCoord(chosenDirection, size, obstaclesArr);
+            blockedByWall = newCoord == Coordinate;
 
-            validNewCoord = wallsArr.All(w => w.Coordinate != newCoord);
-            
-            if (!validNewCoord) _writer.WriteLine(Messages.WallObstruction);
+            if (blockedByWall) _writer.WriteLine(Messages.WallObstruction);
 
-        } while (!validNewCoord);
+        } while (blockedByWall);
 
         Coordinate = newCoord;
+    }
+
+    private Direction _getDirection(string keyPress)
+    {
+        return keyPress switch
+        {
+            Constants.UpKey => Direction.North,
+            Constants.DownKey => Direction.South,
+            Constants.LeftKey => Direction.East,
+            Constants.RightKey => Direction.West,
+            _ => throw new ArgumentOutOfRangeException(keyPress)
+        };
     }
 }
