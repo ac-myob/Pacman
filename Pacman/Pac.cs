@@ -12,16 +12,22 @@ public class Pac
         _reader = reader;
         _writer = writer;
     }
-    public void Move()
+    public void Move(Size size)
     {
         var (x, y) = Coordinate;
 
+        int Mod(int x, int m)
+        {
+            var r = x % m;
+            return r < 0 ? r + m : r;
+        }
+
         Coordinate = _reader.ReadKey() switch
         {
-            "UpArrow" => new Coordinate(x, y - 1),
-            "DownArrow" => new Coordinate(x, y + 1),
-            "LeftArrow" => new Coordinate(x - 1, y),
-            "RightArrow" => new Coordinate(x + 1, y),
+            "UpArrow" => new Coordinate(x, Mod(y - 1, size.Length)),
+            "DownArrow" => new Coordinate(x, Mod(y + 1, size.Length)),
+            "LeftArrow" => new Coordinate(Mod(x - 1, size.Width), y),
+            "RightArrow" => new Coordinate(Mod(x + 1, size.Width), y),
             _ => Coordinate
         };
     }
