@@ -15,21 +15,16 @@ public class Pac
     public void Move(Size size)
     {
         var (x, y) = Coordinate;
-
-        int Mod(int num, int m)
-        {
-            var r = num % m;
-            return r < 0 ? r + m : r;
-        }
+        var (width, length) = size;
 
         var keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
         
         Coordinate = keyPress switch
         {
-            Constants.UpKey => new Coordinate(x, Mod(y - 1, size.Length)),
-            Constants.DownKey => new Coordinate(x, Mod(y + 1, size.Length)),
-            Constants.LeftKey => new Coordinate(Mod(x - 1, size.Width), y),
-            Constants.RightKey => new Coordinate(Mod(x + 1, size.Width), y),
+            Constants.UpKey => new Coordinate(x, Utilities.Mod(y - 1, length)),
+            Constants.DownKey => new Coordinate(x, Utilities.Mod(y + 1, length)),
+            Constants.LeftKey => new Coordinate(Utilities.Mod(x - 1, width), y),
+            Constants.RightKey => new Coordinate(Utilities.Mod(x + 1, width), y),
             _ => Coordinate
         };
     }
