@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using Moq;
 using Xunit;
@@ -20,6 +19,7 @@ public class PacTests
 
         pac.Move(new Size(3, 3));
         
+        _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
     }
     
@@ -33,7 +33,23 @@ public class PacTests
 
         pac.Move(mapSize);
         
+        _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
+    }
+
+    [Fact]
+    public void Move_ShouldContinuouslyQueryForKey_WhenKeyPressIsInvalid()
+    {
+        const string invalidKeyPress = "";
+        const string validKeyPress = "UpArrow";
+        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
+        _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
+        
+        pac.Move(new Size(3, 3));
+        
+        _writer.Verify(_ => _.WriteLine(Messages.InvalidKeyPress), Times.Once);
+        _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
+        Assert.Equal(new Coordinate(1, 0), pac.Coordinate);
     }
 
     private static IEnumerable<object[]> PrimitiveMoveTestData()
