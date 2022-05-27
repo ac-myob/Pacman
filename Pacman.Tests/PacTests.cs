@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Moq;
 using Xunit;
@@ -17,7 +18,7 @@ public class PacTests
         var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(new Size(3, 3));
+        pac.Move(new Size(3, 3), Array.Empty<Wall>());
         
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
@@ -31,7 +32,7 @@ public class PacTests
         var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(mapSize);
+        pac.Move(mapSize, Array.Empty<Wall>());
         
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
@@ -45,11 +46,25 @@ public class PacTests
         var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
         
-        pac.Move(new Size(3, 3));
+        pac.Move(new Size(3, 3), Array.Empty<Wall>());
         
         _writer.Verify(_ => _.WriteLine(Messages.InvalidKeyPress), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
         Assert.Equal(new Coordinate(1, 0), pac.Coordinate);
+    }
+    
+    [Fact]
+    public void Move_ShouldContinuouslyQueryForKey_WhenMovingIntoAWall()
+    {
+        var walls = new List<Wall> {new (new Coordinate(1, 0))};
+        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
+        _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);
+        
+        pac.Move(new Size(3, 3), walls);
+        
+        _writer.Verify(_ => _.WriteLine(Messages.WallObstruction), Times.Once);
+        _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
+        Assert.Equal(new Coordinate(1, 2), pac.Coordinate);
     }
 
     private static IEnumerable<object[]> PrimitiveMoveTestData()
