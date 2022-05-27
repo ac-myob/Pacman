@@ -1,4 +1,4 @@
-namespace Pacman;
+namespace Pacman.Variables;
 
 public static class Constants
 {

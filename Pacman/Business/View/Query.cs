@@ -1,6 +1,6 @@
 using System.Text.RegularExpressions;
 
-namespace Pacman;
+namespace Pacman.Business.View;
 
 public class Query
 {

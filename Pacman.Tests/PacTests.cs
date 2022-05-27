@@ -1,6 +1,10 @@
 using System;
 using System.Collections.Generic;
 using Moq;
+using Pacman.Business.Control;
+using Pacman.Business.Model;
+using Pacman.Business.View;
+using Pacman.Variables;
 using Xunit;
 
 namespace Pacman.Tests;

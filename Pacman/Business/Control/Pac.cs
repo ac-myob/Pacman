@@ -1,6 +1,8 @@
-using System.Collections;
+using Pacman.Business.Model;
+using Pacman.Business.View;
+using Pacman.Variables;
 
-namespace Pacman;
+namespace Pacman.Business.Control;
 
 public class Pac
 {

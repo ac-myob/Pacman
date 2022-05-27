@@ -1,4 +1,4 @@
-namespace Pacman;
+namespace Pacman.Business.View;
 
 public interface IReader
 {

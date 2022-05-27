@@ -1,4 +1,4 @@
-namespace Pacman;
+namespace Pacman.Business.Model;
 
 public class Wall
 {

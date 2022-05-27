@@ -1,4 +1,4 @@
-namespace Pacman;
+namespace Pacman.Business.Control;
 
 public static class Utilities
 {
