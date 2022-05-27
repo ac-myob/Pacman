@@ -15,15 +15,25 @@ public class RandomGhostTests
     [Fact]
     public void Move_MovesGhostToRandomValidPosition_GivenNoObstacles()
     {
-        var mapSize = new Size(3, 3);
         var mockSelector = new Mock<ISelector<Coordinate>>();
         var randomGhost = new RandomGhost(new Coordinate(1, 1), mockSelector.Object);
+        var gameState = new GameState(
+            new Size(3, 3),
+            It.IsAny<Pac>(),
+            Array.Empty<Wall>(),
+            Array.Empty<Entity>()
+            );
         var expectedPosCoords = new[]
-            {new Coordinate(1, 0), new Coordinate(1, 2), new Coordinate(0, 1), new Coordinate(2, 1)};
+        {
+            new Coordinate(1, 0), 
+            new Coordinate(1, 2), 
+            new Coordinate(0, 1), 
+            new Coordinate(2, 1)
+        };
         var actualPosCoords = new List<IEnumerable<Coordinate>>();
 
         mockSelector.Setup(_ => _.Select(Capture.In(actualPosCoords)));
-        randomGhost.Move(mapSize, Array.Empty<Entity>());
+        randomGhost.Move(gameState);
 
         Assert.Equal(expectedPosCoords, actualPosCoords.First());
     }

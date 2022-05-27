@@ -13,11 +13,13 @@ public class RandomGhost : MovableEntity
         _selector = selector;
     }
 
-    public override void Move(Size size, IEnumerable<Entity> obstacles)
+    public override void Move(GameState gameState)
     {
+        var obstacles = gameState.Walls.Concat(gameState.Ghosts);
+        
         var posCoords = 
             (from Direction direction in Enum.GetValues(typeof(Direction))
-            select GetNewCoord(direction, size, obstacles) into currentCoord 
+            select GetNewCoord(direction, gameState.Size, obstacles) into currentCoord 
             where currentCoord != Coordinate select currentCoord).ToArray();
 
         Coordinate = _selector.Select(posCoords);

@@ -7,7 +7,7 @@ public abstract class MovableEntity : Entity
 {
     protected MovableEntity(Coordinate coordinate) : base(coordinate) { }
 
-    public abstract void Move(Size size, IEnumerable<Entity> obstacles);
+    public abstract void Move(GameState gameState);
 
     protected Coordinate GetNewCoord(Direction direction, Size size, IEnumerable<Entity> obstacles)
     {

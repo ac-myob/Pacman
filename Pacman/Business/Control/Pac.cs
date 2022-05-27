@@ -15,9 +15,8 @@ public class Pac : MovableEntity
         _writer = writer;
     }
     
-    public override void Move(Size size, IEnumerable<Entity> obstacles)
+    public override void Move(GameState gameState)
     {
-        var obstaclesArr = obstacles.ToArray();
         bool blockedByWall;
         Coordinate newCoord;
         
@@ -25,7 +24,7 @@ public class Pac : MovableEntity
         {
             var keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
             var chosenDirection = _getDirection(keyPress);
-            newCoord = GetNewCoord(chosenDirection, size, obstaclesArr);
+            newCoord = GetNewCoord(chosenDirection, gameState.Size, gameState.Walls);
             blockedByWall = newCoord == Coordinate;
 
             if (blockedByWall) _writer.WriteLine(Messages.WallObstruction);

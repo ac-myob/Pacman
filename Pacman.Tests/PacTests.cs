@@ -20,9 +20,15 @@ public class PacTests
         Coordinate startingCoord, string keyPress, Coordinate expectedCoord)
     {
         var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
+        var gameState = new GameState(
+            new Size(3, 3),
+            pac,
+            Array.Empty<Wall>(),
+            Array.Empty<Entity>()
+        );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(new Size(3, 3), Array.Empty<Wall>());
+        pac.Move(gameState);
         
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
@@ -34,9 +40,15 @@ public class PacTests
         Coordinate startingCoord, Size mapSize, string keyPress, Coordinate expectedCoord)
     {
         var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
+        var gameState = new GameState(
+            mapSize,
+            pac,
+            Array.Empty<Wall>(),
+            Array.Empty<Entity>()
+        );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(mapSize, Array.Empty<Wall>());
+        pac.Move(gameState);
         
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
@@ -48,9 +60,15 @@ public class PacTests
         const string invalidKeyPress = "";
         const string validKeyPress = Constants.UpKey;
         var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
+        var gameState = new GameState(
+            new Size(3, 3),
+            pac,
+            Array.Empty<Wall>(),
+            Array.Empty<Entity>()
+        );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
         
-        pac.Move(new Size(3, 3), Array.Empty<Wall>());
+        pac.Move(gameState);
         
         _writer.Verify(_ => _.WriteLine(Messages.InvalidKeyPress), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
@@ -60,11 +78,16 @@ public class PacTests
     [Fact]
     public void Move_ShouldContinuouslyQueryForKey_WhenMovingIntoAWall()
     {
-        var walls = new List<Wall> {new (new Coordinate(1, 0))};
         var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
+        var gameState = new GameState(
+            new Size(3, 3), 
+            pac,
+            new Wall[] {new (new Coordinate(1, 0))}, 
+            Array.Empty<Entity>()
+            );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);
         
-        pac.Move(new Size(3, 3), walls);
+        pac.Move(gameState);
         
         _writer.Verify(_ => _.WriteLine(Messages.WallObstruction), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
