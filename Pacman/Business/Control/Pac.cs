@@ -4,19 +4,18 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public class Pac
+public class Pac : MovableEntity
 {
-    public Coordinate Coordinate { get; private set; }
     private readonly Query _query;
     private readonly IWriter _writer;
 
-    public Pac(Coordinate coordinate, IReader reader, IWriter writer)
+    public Pac(Coordinate coordinate, IReader reader, IWriter writer) : base(coordinate)
     {
-        Coordinate = coordinate;
         _query = new Query(reader, writer);
         _writer = writer;
     }
-    public void Move(Size size, IEnumerable<Wall> walls)
+    
+    public override void Move(Size size, IEnumerable<Entity> walls)
     {
         var (x, y) = Coordinate;
         var (width, length) = size;

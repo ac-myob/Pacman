@@ -1,11 +1,6 @@
 namespace Pacman.Business.Model;
 
-public class Wall
+public class Wall : Entity
 {
-    public Coordinate Coordinate { get; }
-    
-    public Wall(Coordinate coordinate)
-    {
-        Coordinate = coordinate;
-    }
+    public Wall(Coordinate coordinate) : base(coordinate) { }
 }
