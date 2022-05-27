@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using Moq;
 using Xunit;
 
@@ -8,51 +10,47 @@ public class PacTests
     private readonly Mock<IReader> _reader = new();
     private readonly Mock<IWriter> _writer = new();
 
-    [Fact]
-    public void Move_ShouldMovePacUp_WhenUpKeyPressed()
+    [Theory]
+    [MemberData(nameof(PrimitiveMoveTestData))]
+    public void Move_ShouldMoveInRespectiveDirection_WhenKeyIsPressed(
+        Coordinate startingCoord, string keyPress, Coordinate expectedCoord)
     {
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var expectedCoordinate = new Coordinate(1, 0);
-        _reader.Setup(_ => _.ReadKey()).Returns("UpArrow");
+        var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
+        _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
         pac.Move();
         
-        Assert.Equal(expectedCoordinate, pac.Coordinate);
+        Assert.Equal(expectedCoord, pac.Coordinate);
     }
-    
-    [Fact]
-    public void Move_ShouldMovePacDown_WhenDownKeyPressed()
-    {
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var expectedCoordinate = new Coordinate(1, 2);
-        _reader.Setup(_ => _.ReadKey()).Returns("DownArrow");
 
-        pac.Move();
-        
-        Assert.Equal(expectedCoordinate, pac.Coordinate);
-    }
-    
-    [Fact]
-    public void Move_ShouldMovePacLeft_WhenLeftKeyPressed()
+    private static IEnumerable<object[]> PrimitiveMoveTestData()
     {
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var expectedCoordinate = new Coordinate(0, 1);
-        _reader.Setup(_ => _.ReadKey()).Returns("LeftArrow");
-
-        pac.Move();
+        yield return new object[]
+        {
+            new Coordinate(1, 1),
+            "UpArrow",
+            new Coordinate(1, 0)
+        };
         
-        Assert.Equal(expectedCoordinate, pac.Coordinate);
-    }
-    
-    [Fact]
-    public void Move_ShouldMovePacUp_WhenRightKeyPressed()
-    {
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var expectedCoordinate = new Coordinate(2, 1);
-        _reader.Setup(_ => _.ReadKey()).Returns("RightArrow");
-
-        pac.Move();
+        yield return new object[]
+        {
+            new Coordinate(1, 1),
+            "DownArrow",
+            new Coordinate(1, 2)
+        };
         
-        Assert.Equal(expectedCoordinate, pac.Coordinate);
+        yield return new object[]
+        {
+            new Coordinate(1, 1),
+            "LeftArrow",
+            new Coordinate(0, 1)
+        };
+        
+        yield return new object[]
+        {
+            new Coordinate(1, 1),
+            "RightArrow",
+            new Coordinate(2, 1)
+        };
     }
 }
