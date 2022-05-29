@@ -2,7 +2,7 @@ using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
-namespace Pacman.Business.Control;
+namespace Pacman.Business.Control.Ghosts;
 
 public class RandomGhost : MovableEntity
 {
