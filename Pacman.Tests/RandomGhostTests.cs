@@ -22,7 +22,7 @@ public class RandomGhostTests
             new Size(3, 3),
             It.IsAny<Pac>(),
             Array.Empty<Wall>(),
-            Array.Empty<Entity>()
+            Array.Empty<MovableEntity>()
             );
         var expectedPosCoords = new[]
         {
@@ -50,7 +50,28 @@ public class RandomGhostTests
             size,
             It.IsAny<Pac>(),
             walls,
-            Array.Empty<Entity>()
+            Array.Empty<MovableEntity>()
+        );
+        IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
+        var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
+        
+        _mockSelector.Setup(_ => _.Select(Capture.With(match)));
+        randomGhost.Move(gameState);
+        
+        Assert.Equal(expectedPosCoords, actualPosCoords);
+    }
+    
+    [Theory]
+    [MemberData(nameof(GhostsTestData))]
+    public void Move_MovesGhostToRandomValidPosition_GivenGhosts(
+        Size size, Coordinate ghostStartCoord, IEnumerable<MovableEntity> ghosts, IEnumerable<Coordinate> expectedPosCoords)
+    {
+        var randomGhost = new RandomGhost(ghostStartCoord, _mockSelector.Object);
+        var gameState = new GameState(
+            size,
+            It.IsAny<Pac>(),
+            Array.Empty<Wall>(),
+            ghosts
         );
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
@@ -93,6 +114,17 @@ public class RandomGhostTests
             new Coordinate(1, 1),
             new Wall[] {new(new Coordinate(0, 1))},
             new Coordinate[] {new(1, 0), new(1, 2), new(2, 1)}
+        };
+    }
+
+    private static IEnumerable<object[]> GhostsTestData()
+    {
+        yield return new object[]
+        {
+            new Size(3, 3),
+            new Coordinate(1, 1),
+            new MovableEntity[] {new RandomGhost(new Coordinate(1, 0), It.IsAny<ISelector<Coordinate>>())},
+            new Coordinate[] {new(1, 2), new(2, 1), new(0, 1)}
         };
     }
 }
