@@ -12,11 +12,12 @@ namespace Pacman.Tests;
 
 public class RandomGhostTests
 {
+    private readonly Mock<ISelector<Coordinate>> _mockSelector = new();
+    
     [Fact]
     public void Move_MovesGhostToRandomValidPosition_GivenNoObstacles()
     {
-        var mockSelector = new Mock<ISelector<Coordinate>>();
-        var randomGhost = new RandomGhost(new Coordinate(1, 1), mockSelector.Object);
+        var randomGhost = new RandomGhost(new Coordinate(1, 1), _mockSelector.Object);
         var gameState = new GameState(
             new Size(3, 3),
             It.IsAny<Pac>(),
@@ -27,14 +28,71 @@ public class RandomGhostTests
         {
             new Coordinate(1, 0), 
             new Coordinate(1, 2), 
-            new Coordinate(0, 1), 
-            new Coordinate(2, 1)
+            new Coordinate(2, 1), 
+            new Coordinate(0, 1)
         };
-        var actualPosCoords = new List<IEnumerable<Coordinate>>();
+        IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
+        var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
 
-        mockSelector.Setup(_ => _.Select(Capture.In(actualPosCoords)));
+        _mockSelector.Setup(_ => _.Select(Capture.With(match)));
         randomGhost.Move(gameState);
 
-        Assert.Equal(expectedPosCoords, actualPosCoords.First());
+        Assert.Equal(expectedPosCoords, actualPosCoords);
+    }
+    
+    [Theory]
+    [MemberData(nameof(WallsTestData))]
+    public void Move_MovesGhostToRandomValidPosition_GivenWalls(
+        Size size, Coordinate ghostStartCoord, IEnumerable<Wall> walls, IEnumerable<Coordinate> expectedPosCoords)
+    {
+        var randomGhost = new RandomGhost(ghostStartCoord, _mockSelector.Object);
+        var gameState = new GameState(
+            size,
+            It.IsAny<Pac>(),
+            walls,
+            Array.Empty<Entity>()
+        );
+        IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
+        var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
+        
+        _mockSelector.Setup(_ => _.Select(Capture.With(match)));
+        randomGhost.Move(gameState);
+        
+        Assert.Equal(expectedPosCoords, actualPosCoords);
+    }
+
+    private static IEnumerable<object[]> WallsTestData()
+    {
+        yield return new object[]
+        {
+            new Size(3, 3),
+            new Coordinate(1, 1),
+            new Wall[] {new(new Coordinate(1, 0))},
+            new Coordinate[] {new(1, 2), new(2, 1), new(0, 1)}
+        };
+        
+        yield return new object[]
+        {
+            new Size(3, 3),
+            new Coordinate(1, 1),
+            new Wall[] {new(new Coordinate(2, 1))},
+            new Coordinate[] {new(1, 0), new(1, 2), new(0, 1)}
+        };
+        
+        yield return new object[]
+        {
+            new Size(3, 3),
+            new Coordinate(1, 1),
+            new Wall[] {new(new Coordinate(1, 2))},
+            new Coordinate[] {new(1, 0), new(2, 1), new(0, 1)}
+        };
+        
+        yield return new object[]
+        {
+            new Size(3, 3),
+            new Coordinate(1, 1),
+            new Wall[] {new(new Coordinate(0, 1))},
+            new Coordinate[] {new(1, 0), new(1, 2), new(2, 1)}
+        };
     }
 }

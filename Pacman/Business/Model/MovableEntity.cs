@@ -17,8 +17,8 @@ public abstract class MovableEntity : Entity
         {
             Direction.North => new Coordinate(x, Utilities.Mod(y - 1, length)),
             Direction.South => new Coordinate(x, Utilities.Mod(y + 1, length)),
-            Direction.East => new Coordinate(Utilities.Mod(x - 1, width), y),
-            Direction.West => new Coordinate(Utilities.Mod(x + 1, width), y),
+            Direction.East => new Coordinate(Utilities.Mod(x + 1, width), y),
+            Direction.West => new Coordinate(Utilities.Mod(x - 1, width), y),
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
 
