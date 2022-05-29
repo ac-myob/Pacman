@@ -40,8 +40,8 @@ public class Pac : MovableEntity
         {
             Constants.UpKey => Direction.North,
             Constants.DownKey => Direction.South,
-            Constants.LeftKey => Direction.East,
-            Constants.RightKey => Direction.West,
+            Constants.LeftKey => Direction.West,
+            Constants.RightKey => Direction.East,
             _ => throw new ArgumentOutOfRangeException(keyPress)
         };
     }
