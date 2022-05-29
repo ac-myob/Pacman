@@ -6,7 +6,6 @@ public class GameState
 {
     public Size Size { get; }
     public Pac Pac { get; }
-    
     public IEnumerable<Entity> Walls { get; }
     public IEnumerable<MovableEntity> Ghosts { get; }
     
