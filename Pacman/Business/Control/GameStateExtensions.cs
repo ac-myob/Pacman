@@ -62,9 +62,4 @@ public static class GameStateExtensions
         
         return res.ToString();
     }
-
-    public static void RemovePellet(this GameState gameState, Coordinate coordinate)
-    {
-        gameState.Pellets.Remove(coordinate);
-    }
 }

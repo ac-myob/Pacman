@@ -31,7 +31,7 @@ public class Pac : MovableEntity
 
         } while (blockedByWall);
 
-        gameState.RemovePellet(newCoord);
+        gameState.Pellets.Remove(newCoord);
         Coordinate = newCoord;
     }
 
