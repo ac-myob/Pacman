@@ -29,7 +29,7 @@ public static class GameStateExtensions
         var entities = gameState.Ghosts.
             Append(gameState.Pac).
             Concat(gameState.Walls).
-            Concat(gameState.Pellets).
+            Concat(gameState.Pellets.Values).
             OrderBy(o => o.Coordinate.Y).
             ThenBy(o => o.Coordinate.X).
             ToList();
@@ -61,5 +61,10 @@ public static class GameStateExtensions
         }
         
         return res.ToString();
+    }
+
+    public static void RemovePellet(this GameState gameState, Coordinate coordinate)
+    {
+        gameState.Pellets.Remove(coordinate);
     }
 }

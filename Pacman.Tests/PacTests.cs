@@ -24,7 +24,7 @@ public class PacTests
             new Size(3, 3),
             pac,
             Array.Empty<Wall>(),
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
@@ -38,14 +38,14 @@ public class PacTests
     [Theory]
     [MemberData(nameof(WrappingTestData))]
     public void Move_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
-        Coordinate startingCoord, Size mapSize, string keyPress, Coordinate expectedCoord)
+        Coordinate pacCoord, Size mapSize, string keyPress, Coordinate expectedCoord)
     {
-        var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
+        var pac = new Pac(pacCoord, _reader.Object, _writer.Object);
         var gameState = new GameState(
             mapSize,
             pac,
             Array.Empty<Wall>(),
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
@@ -66,7 +66,7 @@ public class PacTests
             new Size(3, 3),
             pac,
             Array.Empty<Wall>(),
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
@@ -86,7 +86,7 @@ public class PacTests
             new Size(3, 3), 
             pac,
             new Wall[] {new (new Coordinate(1, 0))}, 
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
             );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);
@@ -96,6 +96,26 @@ public class PacTests
         _writer.Verify(_ => _.WriteLine(Messages.WallObstruction), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
         Assert.Equal(new Coordinate(1, 2), pac.Coordinate);
+    }
+    
+    [Theory]
+    [MemberData(nameof(RemovePelletTestData))]
+    public void Move_ShouldRemovePelletAtNewCoordinate(
+        Size mapSize, Coordinate pacCoord, string keyPress, Coordinate pelletCoord)
+    {
+        var pac = new Pac(pacCoord, _reader.Object, _writer.Object);
+        var gameState = new GameState(
+            mapSize, 
+            pac,
+            Array.Empty<Wall>(), 
+            new Dictionary<Coordinate, Pellet> {{pelletCoord, new Pellet(pelletCoord)}},
+            Array.Empty<MovableEntity>()
+        );
+        _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
+
+        pac.Move(gameState);
+        
+        Assert.Empty(gameState.Pellets);
     }
 
     private static IEnumerable<object[]> PrimitiveMoveTestData()
@@ -161,6 +181,25 @@ public class PacTests
             new Size(2, 2),
             Constants.RightKey,
             new Coordinate(0, 1)
+        };
+    }
+
+    private static IEnumerable<object[]> RemovePelletTestData()
+    {
+        yield return new object[]
+        {
+            new Size(2, 2),
+            new Coordinate(0, 0),
+            Constants.RightKey,
+            new Coordinate(1, 0)
+        };
+        
+        yield return new object[]
+        {
+            new Size(2, 2),
+            new Coordinate(0, 0),
+            Constants.LeftKey,
+            new Coordinate(1, 0)
         };
     }
 }
