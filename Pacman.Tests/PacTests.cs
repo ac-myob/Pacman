@@ -24,6 +24,7 @@ public class PacTests
             new Size(3, 3),
             pac,
             Array.Empty<Wall>(),
+            It.IsAny<Pellet[]>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
@@ -44,6 +45,7 @@ public class PacTests
             mapSize,
             pac,
             Array.Empty<Wall>(),
+            It.IsAny<Pellet[]>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
@@ -64,6 +66,7 @@ public class PacTests
             new Size(3, 3),
             pac,
             Array.Empty<Wall>(),
+            It.IsAny<Pellet[]>(),
             Array.Empty<MovableEntity>()
         );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
@@ -83,6 +86,7 @@ public class PacTests
             new Size(3, 3), 
             pac,
             new Wall[] {new (new Coordinate(1, 0))}, 
+            It.IsAny<Pellet[]>(),
             Array.Empty<MovableEntity>()
             );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);

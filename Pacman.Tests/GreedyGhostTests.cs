@@ -19,7 +19,13 @@ public class GreedyGhostTests
     {
         var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
         var greedyGhost = new GreedyGhost(ghostCoord, pac);
-        var gameState = new GameState(mapSize, pac, Array.Empty<Wall>(), Array.Empty<MovableEntity>());
+        var gameState = new GameState(
+            mapSize, 
+            pac, 
+            Array.Empty<Wall>(), 
+            It.IsAny<Pellet[]>(), 
+            Array.Empty<MovableEntity>()
+            );
 
         greedyGhost.Move(gameState);
         
@@ -33,7 +39,13 @@ public class GreedyGhostTests
     {
         var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
         var greedyGhost = new GreedyGhost(ghostCoord, pac);
-        var gameState = new GameState(mapSize, pac, walls, Array.Empty<MovableEntity>());
+        var gameState = new GameState(
+            mapSize, 
+            pac, 
+            walls, 
+            It.IsAny<Pellet[]>(),
+            Array.Empty<MovableEntity>()
+            );
 
         greedyGhost.Move(gameState);
         
@@ -47,7 +59,13 @@ public class GreedyGhostTests
     {
         var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
         var greedyGhost = new GreedyGhost(ghostCoord, pac);
-        var gameState = new GameState(mapSize, pac, Array.Empty<Wall>(), ghosts);
+        var gameState = new GameState(
+            mapSize, 
+            pac, 
+            Array.Empty<Wall>(), 
+            It.IsAny<Pellet[]>(),
+            ghosts
+            );
 
         greedyGhost.Move(gameState);
         
