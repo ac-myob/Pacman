@@ -22,7 +22,7 @@ public class PathFindingGhostTests
             mapSize,
             pac,
             Array.Empty<Wall>(),
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
             );
 
@@ -42,7 +42,7 @@ public class PathFindingGhostTests
             mapSize,
             pac,
             walls,
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
         );
 

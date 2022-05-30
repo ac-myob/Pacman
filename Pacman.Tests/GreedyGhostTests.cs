@@ -20,10 +20,10 @@ public class GreedyGhostTests
         var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
         var greedyGhost = new GreedyGhost(ghostCoord, pac);
         var gameState = new GameState(
-            mapSize, 
-            pac, 
-            Array.Empty<Wall>(), 
-            It.IsAny<Pellet[]>(), 
+            mapSize,
+            pac,
+            Array.Empty<Wall>(),
+            new Dictionary<Coordinate, Pellet>(), 
             Array.Empty<MovableEntity>()
             );
 
@@ -43,7 +43,7 @@ public class GreedyGhostTests
             mapSize, 
             pac, 
             walls, 
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
             );
 
@@ -63,7 +63,7 @@ public class GreedyGhostTests
             mapSize, 
             pac, 
             Array.Empty<Wall>(), 
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             ghosts
             );
 

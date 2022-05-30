@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Moq;
 using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
@@ -22,7 +20,7 @@ public class GameStateExtensionsTests
             new Size(3, 3),
             pac,
             new Wall[] { new(new Coordinate(1, 1))},
-            Array.Empty<Pellet>(),
+            new Dictionary<Coordinate, Pellet>(),
             new MovableEntity[]
             {
                 new RandomGhost(new Coordinate(0, 2), It.IsAny<ISelector<Coordinate>>()),
@@ -40,10 +38,14 @@ public class GameStateExtensionsTests
     [Fact]
     public void GetString_ReturnsStringRepresentationOfGame_WhenEntitiesShareSameCoordinate()
     {
-        var pellets = new List<Pellet>();
+        var pellets = new Dictionary<Coordinate, Pellet>();
         for (var i = 0; i < 3; i++)
             for (var j = 0; j < 3; j++)
-                pellets.Add(new Pellet(new Coordinate(i, j)));
+            {
+                var coord = new Coordinate(i, j);
+                pellets.Add(coord, new Pellet(coord));
+            }
+                
         
         var pac = new Pac(new Coordinate(0, 0), It.IsAny<IReader>(), It.IsAny<IWriter>());
         var gameState = new GameState(

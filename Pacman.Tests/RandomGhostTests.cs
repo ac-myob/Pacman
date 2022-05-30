@@ -22,7 +22,7 @@ public class RandomGhostTests
             new Size(3, 3),
             It.IsAny<Pac>(),
             Array.Empty<Wall>(),
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
             );
         var expectedPosCoords = new[]
@@ -51,7 +51,7 @@ public class RandomGhostTests
             size,
             It.IsAny<Pac>(),
             walls,
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             Array.Empty<MovableEntity>()
         );
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
@@ -73,7 +73,7 @@ public class RandomGhostTests
             size,
             It.IsAny<Pac>(),
             Array.Empty<Wall>(),
-            It.IsAny<Pellet[]>(),
+            new Dictionary<Coordinate, Pellet>(),
             ghosts
         );
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
