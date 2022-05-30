@@ -22,7 +22,7 @@ public class GreedyGhost : MovableEntity
         
         foreach (Direction direction in Enum.GetValues(typeof(Direction)))
         {
-            var currentCoord = GetNewCoord(direction, gameState.Size, obstacles);
+            var currentCoord = gameState.GetNewCoord(Coordinate, direction, obstacles);
             var currentDistance = _distanceFromPac(currentCoord);
             
             if (currentDistance >= bestDistance) continue;

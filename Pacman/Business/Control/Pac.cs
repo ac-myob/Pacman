@@ -24,7 +24,7 @@ public class Pac : MovableEntity
         {
             var keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
             var chosenDirection = _getDirection(keyPress);
-            newCoord = GetNewCoord(chosenDirection, gameState.Size, gameState.Walls);
+            newCoord = gameState.GetNewCoord(Coordinate, chosenDirection, gameState.Walls);
             blockedByWall = newCoord == Coordinate;
 
             if (blockedByWall) _writer.WriteLine(Messages.WallObstruction);

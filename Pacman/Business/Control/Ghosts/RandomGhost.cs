@@ -18,7 +18,7 @@ public class RandomGhost : MovableEntity
         var obstacles = gameState.Walls.Concat(gameState.Ghosts).ToArray();
         var posCoords = 
             (from Direction direction in Enum.GetValues(typeof(Direction)) 
-            select GetNewCoord(direction, gameState.Size, obstacles) into currentCoord 
+            select gameState.GetNewCoord(Coordinate, direction, obstacles) into currentCoord 
             where currentCoord != Coordinate select currentCoord).ToArray();
 
         Coordinate = _selector.Select(posCoords);
