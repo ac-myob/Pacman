@@ -25,12 +25,20 @@ public class PathFindingGhost : MovableEntity
         
         do
         {
-            dequeuedCoords = possiblePaths.Dequeue().ToArray();
-            lastDequeuedCoord = dequeuedCoords.Last();
+            // If cannot move, do nothing
+            try
+            {
+                dequeuedCoords = possiblePaths.Dequeue().ToArray();
+                lastDequeuedCoord = dequeuedCoords.Last();
+            }
+            catch (InvalidOperationException)
+            {
+                return;
+            }
+
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
                 var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstacles);
-                
                 if (currCoord == lastDequeuedCoord) continue;
                 possiblePaths.Enqueue(dequeuedCoords.Append(currCoord));
             }
