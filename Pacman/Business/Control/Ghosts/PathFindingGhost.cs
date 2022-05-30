@@ -7,7 +7,7 @@ public class PathFindingGhost : MovableEntity
 {
     private readonly Pac _pac;
 
-    public PathFindingGhost(Coordinate coordinate, Pac pac) : base(coordinate)
+    public PathFindingGhost(Coordinate coordinate, Pac pac) : base(coordinate, Constants.PathFindingGhost)
     {
         _pac = pac;
     }

@@ -8,7 +8,7 @@ public class RandomGhost : MovableEntity
 {
     private readonly ISelector<Coordinate> _selector;
 
-    public RandomGhost(Coordinate coordinate, ISelector<Coordinate> selector) : base(coordinate)
+    public RandomGhost(Coordinate coordinate, ISelector<Coordinate> selector) : base(coordinate, Constants.RandomGhost)
     {
         _selector = selector;
     }

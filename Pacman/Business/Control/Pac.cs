@@ -9,7 +9,7 @@ public class Pac : MovableEntity
     private readonly Query _query;
     private readonly IWriter _writer;
 
-    public Pac(Coordinate coordinate, IReader reader, IWriter writer) : base(coordinate)
+    public Pac(Coordinate coordinate, IReader reader, IWriter writer) : base(coordinate, Constants.PacStart)
     {
         _query = new Query(reader, writer);
         _writer = writer;

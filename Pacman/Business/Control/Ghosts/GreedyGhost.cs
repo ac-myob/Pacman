@@ -7,7 +7,7 @@ public class GreedyGhost : MovableEntity
 {
     private readonly Pac _pac;
 
-    public GreedyGhost(Coordinate coordinate, Pac pac) : base(coordinate)
+    public GreedyGhost(Coordinate coordinate, Pac pac) : base(coordinate, Constants.GreedyGhost)
     {
         _pac = pac;
     }
