@@ -29,6 +29,7 @@ public static class GameStateExtensions
         var entities = gameState.Ghosts.
             Append(gameState.Pac).
             Concat(gameState.Walls).
+            Concat(gameState.Pellets).
             OrderBy(o => o.Coordinate.Y).
             ThenBy(o => o.Coordinate.X).
             ToList();
