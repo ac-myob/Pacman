@@ -1,6 +1,3 @@
-using Pacman.Business.Control;
-using Pacman.Variables;
-
 namespace Pacman.Business.Model;
 
 public abstract class MovableEntity : Entity

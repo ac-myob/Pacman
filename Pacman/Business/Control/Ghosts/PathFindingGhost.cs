@@ -20,9 +20,9 @@ public class PathFindingGhost : MovableEntity
         var possiblePaths = new Queue<IEnumerable<Coordinate>>();
         possiblePaths.Enqueue(new List<Coordinate> {Coordinate});
         
-        Coordinate lastDequeuedCoord;
         IEnumerable<Coordinate> dequeuedCoords;
-
+        Coordinate lastDequeuedCoord;
+        
         do
         {
             dequeuedCoords = possiblePaths.Dequeue().ToArray();
@@ -37,6 +37,7 @@ public class PathFindingGhost : MovableEntity
             
         } while (lastDequeuedCoord != _pac.Coordinate);
 
-        Coordinate = dequeuedCoords.Skip(1).First();
+        // Select second coordinate because first will always be ghost's starting coordinate
+        Coordinate = dequeuedCoords.ElementAt(1);
     }
 }
