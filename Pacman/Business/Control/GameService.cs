@@ -48,6 +48,9 @@ public class GameService
                     case Constants.GreedyGhost:
                         ghosts.Add(new GreedyGhost(currentCoord, pac));
                         break;
+                    case Constants.PathFindingGhost:
+                        ghosts.Add(new PathFindingGhost(currentCoord, pac));
+                        break;
                 }
             }
 
