@@ -32,6 +32,18 @@ public class GameService
         var walls = new List<Wall>();
         var ghosts = new List<MovableEntity>();
         var pellets = new Dictionary<Coordinate, Pellet>();
+        
+        for (var l = 0; l < length; l++)
+            for (var w = 0; w < width; w++)
+            {
+                var currentCoord = new Coordinate(w, l);
+                switch (fileLines[l][w])
+                {
+                    case Constants.Wall:
+                        walls.Add(new Wall(currentCoord));
+                        break;
+                }
+            }
 
         return new GameState(size, pac, walls, pellets, ghosts);
     }

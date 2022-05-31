@@ -1,3 +1,4 @@
+using System.Linq;
 using Moq;
 using Pacman.Business.Control;
 using Pacman.Business.Model;
@@ -40,5 +41,14 @@ public class GameServiceTests
         var actualGameState = _gameService.GetNewGameState("../../../../Pacman/Games/TestGame1.txt");
         
         Assert.Equal(expectedPacCoord, actualGameState.Pac.Coordinate);
+    }
+    
+    [Fact]
+    public void GetNewGameState_ReturnsGameStateWithCorrectWallCoordinates_WhenGivenTxtFile()
+    {
+        var expectedWallCoords = new[] {new Coordinate(2, 2), new Coordinate(0, 3)};
+        var actualGameState = _gameService.GetNewGameState("../../../../Pacman/Games/TestGame1.txt");
+        
+        Assert.Equal(expectedWallCoords, actualGameState.Walls.Select(w => w.Coordinate));
     }
 }
