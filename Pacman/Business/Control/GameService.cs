@@ -42,6 +42,9 @@ public class GameService
                     case Constants.Wall:
                         walls.Add(new Wall(currentCoord));
                         break;
+                    case Constants.RandomGhost:
+                        ghosts.Add(new RandomGhost(currentCoord, new RandomSelector<Coordinate>()));
+                        break;
                 }
             }
 

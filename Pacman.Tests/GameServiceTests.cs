@@ -1,6 +1,7 @@
 using System.Linq;
 using Moq;
 using Pacman.Business.Control;
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Exceptions;
@@ -13,6 +14,7 @@ public class GameServiceTests
     private readonly Mock<IReader> _mockReader = new();
     private readonly Mock<IWriter> _mockWriter = new();
     private readonly GameService _gameService;
+    private const string TestGame = "../../../../Pacman/Games/TestGame.txt";
     
     public GameServiceTests()
     {
@@ -22,7 +24,7 @@ public class GameServiceTests
     [Fact]
     public void GetNewGameState_ReturnsGameStateWithCorrectSize_WhenGivenTxtFile()
     {
-        var actualGameState = _gameService.GetNewGameState("../../../../Pacman/Games/TestGame1.txt");
+        var actualGameState = _gameService.GetNewGameState(TestGame);
         
         Assert.Equal(new Size(3, 4), actualGameState.Size);
     }
@@ -31,14 +33,14 @@ public class GameServiceTests
     public void GetNewGameState_ThrowsInvalidFileException_WhenFileWidthIsNotUniform()
     {
         Assert.Throws<InvalidFileException>(
-            () => _gameService.GetNewGameState("../../../../Pacman/Games/TestGame2.txt"));
+            () => _gameService.GetNewGameState("../../../../Pacman/Games/JaggedFile.txt"));
     }
     
     [Fact]
     public void GetNewGameState_ReturnsGameStateWithCorrectPacCoordinate_WhenGivenTxtFile()
     {
         var expectedPacCoord = new Coordinate(2, 1);
-        var actualGameState = _gameService.GetNewGameState("../../../../Pacman/Games/TestGame1.txt");
+        var actualGameState = _gameService.GetNewGameState(TestGame);
         
         Assert.Equal(expectedPacCoord, actualGameState.Pac.Coordinate);
     }
@@ -47,8 +49,18 @@ public class GameServiceTests
     public void GetNewGameState_ReturnsGameStateWithCorrectWallCoordinates_WhenGivenTxtFile()
     {
         var expectedWallCoords = new[] {new Coordinate(2, 2), new Coordinate(0, 3)};
-        var actualGameState = _gameService.GetNewGameState("../../../../Pacman/Games/TestGame1.txt");
+        var actualGameState = _gameService.GetNewGameState(TestGame);
         
         Assert.Equal(expectedWallCoords, actualGameState.Walls.Select(w => w.Coordinate));
+    }
+    
+    [Fact]
+    public void GetNewGameState_ReturnsGameStateWithCorrectRandomGhostCoordinate_WhenGivenTxtFile()
+    {
+        var expectedRandomGhostCoord = new Coordinate(1, 2);
+        var actualGameState = _gameService.GetNewGameState(TestGame);
+        var randomGhosts = actualGameState.Ghosts.Where(g => g.GetType() == typeof(RandomGhost));
+        
+        Assert.Contains(randomGhosts, g => g.Coordinate == expectedRandomGhostCoord);
     }
 }
