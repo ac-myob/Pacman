@@ -25,41 +25,22 @@ public static class GameStateExtensions
 
     public static string GetString(this GameState gameState)
     {
-        var res = new StringBuilder();
-        var entities = gameState.Ghosts.
-            Append(gameState.Pac).
+        var (width, length) = gameState.Size;
+        var res = new StringBuilder(new string(Constants.Blank, length * width));
+        var entities = gameState.Pellets.Values.
             Concat(gameState.Walls).
-            Concat(gameState.Pellets.Values).
+            Concat(gameState.Ghosts).
+            Append(gameState.Pac).
             OrderBy(o => o.Coordinate.Y).
             ThenBy(o => o.Coordinate.X).
             ToList();
-        var entityIndex = 0;
-    
-        for (var l = 0; l < gameState.Size.Length; l++)
-        {
-            for (var w = 0; w < gameState.Size.Width; w++)
-            {
-                var nextSymbol = Constants.Blank;
-                if (entityIndex < entities.Count)
-                {
-                    var currentEntity = entities[entityIndex];
 
-                    while (!(currentEntity.Coordinate.Y > l || 
-                             currentEntity.Coordinate.X >= w && 
-                             currentEntity.Coordinate.Y == l))
-                    {
-                        ++entityIndex;
-                        currentEntity = entities[entityIndex];
-                    }
+        foreach (var entity in entities)
+            res[entity.Coordinate.GetRank(width)] = entity.Symbol;
 
-                    if (currentEntity.Coordinate == new Coordinate(w, l))
-                        nextSymbol = currentEntity.Symbol;
-                }
-                res.Append(nextSymbol);
-            }
-            res.Append('\n');
-        }
-        
+        for (var l = 0; l < length; l++)
+            res.Insert(width * (l + 1) + l, '\n');
+
         return res.ToString();
     }
 }
