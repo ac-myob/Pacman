@@ -17,10 +17,10 @@ public class PathFindingGhost : MovableEntity
         if (_pac.Coordinate == Coordinate) return;
         
         var obstacles = gameState.Walls.Concat(gameState.Ghosts).ToArray();
-        var possiblePaths = new Queue<IEnumerable<Coordinate>>();
-        possiblePaths.Enqueue(new List<Coordinate> {Coordinate});
+        var possiblePaths = new Queue<Coordinate[]>();
+        possiblePaths.Enqueue(Array.Empty<Coordinate>());
         
-        IEnumerable<Coordinate> dequeuedCoords;
+        Coordinate[] dequeuedCoords;
         Coordinate lastDequeuedCoord;
         
         do
@@ -29,7 +29,7 @@ public class PathFindingGhost : MovableEntity
             try
             {
                 dequeuedCoords = possiblePaths.Dequeue().ToArray();
-                lastDequeuedCoord = dequeuedCoords.Last();
+                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : Coordinate;
             }
             catch (InvalidOperationException)
             {
@@ -40,12 +40,15 @@ public class PathFindingGhost : MovableEntity
             {
                 var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstacles);
                 if (currCoord == lastDequeuedCoord) continue;
-                possiblePaths.Enqueue(dequeuedCoords.Append(currCoord));
+
+                possiblePaths.Enqueue(dequeuedCoords.Length < 2
+                    ? dequeuedCoords.Append(currCoord).ToArray()
+                    : new[] {dequeuedCoords.First(), currCoord});
             }
             
         } while (lastDequeuedCoord != _pac.Coordinate);
 
         // Select second coordinate because first will always be ghost's starting coordinate
-        Coordinate = dequeuedCoords.ElementAt(1);
+        Coordinate = dequeuedCoords.First();
     }
 }
