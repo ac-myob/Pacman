@@ -39,6 +39,7 @@ public class PathFindingGhost : MovableEntity
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
                 var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstacles);
+                
                 if (currCoord == lastDequeuedCoord) continue;
 
                 possiblePaths.Enqueue(dequeuedCoords.Length < 2
@@ -47,8 +48,7 @@ public class PathFindingGhost : MovableEntity
             }
             
         } while (lastDequeuedCoord != _pac.Coordinate);
-
-        // Select second coordinate because first will always be ghost's starting coordinate
+        
         Coordinate = dequeuedCoords.First();
     }
 }

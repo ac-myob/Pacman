@@ -21,6 +21,9 @@ public class GameService
     public GameState GetNewGameState(string filepath)
     {
         var fileLines = File.ReadAllLines(filepath);
+        if (!fileLines.Any())
+            throw new InvalidFileException("File is empty.");
+        
         var length = fileLines.Length;
         var width = fileLines.First().Length;
 

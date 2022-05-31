@@ -37,14 +37,21 @@ public class GameServiceTests
     }
     
     [Fact]
-    public void GetNewGameState_ReturnsGameStateWithCorrectPacCoordinate_WhenGivenTxtFile()
+    public void GetNewGameState_ThrowsInvalidFileException_WhenFileIsEmpty()
     {
-        var expectedPacCoord = new Coordinate(2, 1);
-        var actualGameState = _gameService.GetNewGameState(TestGame);
-        
-        Assert.Equal(expectedPacCoord, actualGameState.Pac.Coordinate);
+        Assert.Throws<InvalidFileException>(
+            () => _gameService.GetNewGameState("../../../../Pacman/Games/Empty.txt"));
     }
     
+    [Theory]
+    [InlineData("../../../../Pacman/Games/NoPac.txt")]
+    [InlineData("../../../../Pacman/Games/MultiplePac.txt")]
+    public void GetNewGameState_ThrowsInvalidFileException_WhenThereIsNotExactlyOnePacSymbol(string filepath)
+    {
+        Assert.Throws<InvalidFileException>(
+            () => _gameService.GetNewGameState(filepath));
+    }
+
     [Fact]
     public void GetNewGameState_ReturnsGameStateWithCorrectWallCoordinates_WhenGivenTxtFile()
     {
