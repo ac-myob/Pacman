@@ -83,4 +83,13 @@ public class GameServiceTests
         
         Assert.Contains(randomGhosts, g => g.Coordinate == expectedPathFindingGhostCoord);
     }
+    
+    [Fact]
+    public void GetNewGameState_ReturnsGameStateWithCorrectPelletCoordinates_WhenGivenTxtFile()
+    {
+        var expectedPelletCoords = new[] {new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(2, 0)};
+        var actualGameState = _gameService.GetNewGameState(TestGame);
+        
+        Assert.Equal(expectedPelletCoords, actualGameState.Pellets.Keys);
+    }
 }

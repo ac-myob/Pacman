@@ -51,6 +51,9 @@ public class GameService
                     case Constants.PathFindingGhost:
                         ghosts.Add(new PathFindingGhost(currentCoord, pac));
                         break;
+                    case Constants.Pellet:
+                        pellets.Add(currentCoord, new Pellet(currentCoord));
+                        break;
                 }
             }
 
