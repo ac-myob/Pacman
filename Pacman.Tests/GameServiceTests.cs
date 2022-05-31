@@ -63,4 +63,14 @@ public class GameServiceTests
         
         Assert.Contains(randomGhosts, g => g.Coordinate == expectedRandomGhostCoord);
     }
+    
+    [Fact]
+    public void GetNewGameState_ReturnsGameStateWithCorrectGreedyGhostCoordinate_WhenGivenTxtFile()
+    {
+        var expectedGreedyGhostCoord = new Coordinate(0, 2);
+        var actualGameState = _gameService.GetNewGameState(TestGame);
+        var randomGhosts = actualGameState.Ghosts.Where(g => g.GetType() == typeof(GreedyGhost));
+        
+        Assert.Contains(randomGhosts, g => g.Coordinate == expectedGreedyGhostCoord);
+    }
 }

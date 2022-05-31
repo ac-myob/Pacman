@@ -45,6 +45,9 @@ public class GameService
                     case Constants.RandomGhost:
                         ghosts.Add(new RandomGhost(currentCoord, new RandomSelector<Coordinate>()));
                         break;
+                    case Constants.GreedyGhost:
+                        ghosts.Add(new GreedyGhost(currentCoord, pac));
+                        break;
                 }
             }
 
