@@ -32,4 +32,13 @@ public class GameServiceTests
         Assert.Throws<InvalidFileException>(
             () => _gameService.GetNewGameState("../../../../Pacman/Games/TestGame2.txt"));
     }
+    
+    [Fact]
+    public void GetNewGameState_ReturnsGameStateWithCorrectPacCoordinate_WhenGivenTxtFile()
+    {
+        var expectedPacCoord = new Coordinate(2, 1);
+        var actualGameState = _gameService.GetNewGameState("../../../../Pacman/Games/TestGame1.txt");
+        
+        Assert.Equal(expectedPacCoord, actualGameState.Pac.Coordinate);
+    }
 }
