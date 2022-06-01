@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
@@ -45,7 +46,6 @@ public class GameStateExtensionsTests
                 var coord = new Coordinate(i, j);
                 pellets.Add(coord, new Pellet(coord));
             }
-                
         
         var pac = new Pac(new Coordinate(0, 0), It.IsAny<IReader>(), It.IsAny<IWriter>());
         var gameState = new GameState(
@@ -65,5 +65,25 @@ public class GameStateExtensionsTests
                              $"{Constants.RandomGhost}{Constants.Pellet}{Constants.PathFindingGhost}\n";
         
         Assert.Equal(expectedString, gameState.GetString());
+    }
+
+    [Fact]
+    public void GetMovableEntities_ReturnsEnumerableOfEntitiesInCorrectOrder()
+    {
+        var gameState = new GameState(
+            It.IsAny<Size>(),
+            new Pac(new Coordinate(), It.IsAny<IReader>(), It.IsAny<IWriter>()),
+            It.IsAny<IEnumerable<Wall>>(),
+            It.IsAny<IDictionary<Coordinate, Pellet>>(),
+            new MovableEntity[]
+            {
+                new RandomGhost(new Coordinate(), It.IsAny<ISelector<Coordinate>>()),
+                new GreedyGhost(new Coordinate(), It.IsAny<Pac>()),
+                new PathFindingGhost(new Coordinate(), It.IsAny<Pac>())
+            });
+
+        var expectedTypes = new[] {typeof(Pac), typeof(RandomGhost), typeof(GreedyGhost), typeof(PathFindingGhost)};
+        
+        Assert.Equal(expectedTypes, gameState.GetMovableEntities().Select(g => g.GetType()));
     }
 }

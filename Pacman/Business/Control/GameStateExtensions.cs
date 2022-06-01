@@ -43,4 +43,7 @@ public static class GameStateExtensions
 
         return res.ToString();
     }
+
+    public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) =>
+       new MovableEntity[] {gameState.Pac}.Concat(gameState.Ghosts);
 }
