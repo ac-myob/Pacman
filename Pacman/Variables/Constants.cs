@@ -14,4 +14,5 @@ public static class Constants
     public const char PathFindingGhost = 'ᔬ';
     public const char PacStart = '◯';
     public const char Blank = ' ';
+    public const string GameFilepath = "../../../../Pacman/Games/GameMap.txt";
 }
