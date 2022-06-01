@@ -11,6 +11,6 @@ public class RandomSelector<T> : ISelector<T>
         
         var random = new Random();
 
-        return collectionArr.ElementAt(random.Next(0, collectionArr.Length + 1));
+        return collectionArr.ElementAt(random.Next(0, collectionArr.Length));
     }
 }
