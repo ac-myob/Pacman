@@ -85,4 +85,10 @@ public class GameService
             _ => pacCoord
         };
     }
+
+    public void ResetGameState(GameState gameState)
+    {
+        foreach (var movableEntity in gameState.GetMovableEntities())
+            movableEntity.ResetCoordinate();
+    }
 }

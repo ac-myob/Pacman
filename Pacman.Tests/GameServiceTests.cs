@@ -5,6 +5,7 @@ using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Exceptions;
+using Pacman.Variables;
 using Xunit;
 
 namespace Pacman.Tests;
@@ -98,5 +99,22 @@ public class GameServiceTests
         var actualGameState = _gameService.GetNewGameState(TestGame);
         
         Assert.Equal(expectedPelletCoords, actualGameState.Pellets.Keys);
+    }
+
+    [Fact]
+    public void ResetGameState_SetsAllMovableEntitiesToTheirStartCoordinates()
+    {
+        var gameState = _gameService.GetNewGameState(TestGame);
+        var movableEntities = gameState.GetMovableEntities().ToArray();
+        var expectedMovableEntityStartCoords = movableEntities.Select(e => e.Coordinate);
+        _mockReader.Setup(_ => _.ReadKey()).Returns(Constants.UpKey);
+        foreach (var movableEntity in movableEntities)
+            movableEntity.Move(gameState);
+
+        _gameService.ResetGameState(gameState);
+        var actualMovableEntityStartCoords = gameState.GetMovableEntities().Select(e => e.Coordinate);
+        
+        Assert.DoesNotContain(new Coordinate(2, 0), gameState.Pellets.Keys);
+        Assert.Equal(expectedMovableEntityStartCoords, actualMovableEntityStartCoords);
     }
 }
