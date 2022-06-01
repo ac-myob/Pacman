@@ -55,7 +55,7 @@ public class GreedyGhostTests
     [Theory]
     [MemberData(nameof(GhostsTestData))]
     public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenOtherGhosts(
-        Size mapSize, IEnumerable<MovableEntity> ghosts, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
+        Size mapSize, IList<MovableEntity> ghosts, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
         var greedyGhost = new GreedyGhost(ghostCoord, pac);

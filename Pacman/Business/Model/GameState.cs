@@ -8,9 +8,9 @@ public class GameState
     public Pac Pac { get; }
     public IEnumerable<Entity> Walls { get; }
     public IDictionary<Coordinate, Pellet> Pellets { get; }
-    public IEnumerable<MovableEntity> Ghosts { get; }
+    public IList<MovableEntity> Ghosts { get; }
     
-    public GameState(Size size, Pac pac, IEnumerable<Wall> walls, IDictionary<Coordinate, Pellet> pellets, IEnumerable<MovableEntity> ghosts)
+    public GameState(Size size, Pac pac, IEnumerable<Wall> walls, IDictionary<Coordinate, Pellet> pellets, IList<MovableEntity> ghosts)
     {
         Size = size;
         Pac = pac;

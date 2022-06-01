@@ -7,3 +7,10 @@ public enum Direction
     East,
     West
 }
+
+public enum GhostType
+{
+    Random,
+    Greedy,
+    PathFinding
+}

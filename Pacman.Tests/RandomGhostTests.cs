@@ -66,7 +66,7 @@ public class RandomGhostTests
     [Theory]
     [MemberData(nameof(GhostsTestData))]
     public void Move_MovesGhostToRandomValidPosition_GivenGhosts(
-        Size size, Coordinate ghostStartCoord, IEnumerable<MovableEntity> ghosts, IEnumerable<Coordinate> expectedPosCoords)
+        Size size, Coordinate ghostStartCoord, IList<MovableEntity> ghosts, IEnumerable<Coordinate> expectedPosCoords)
     {
         var randomGhost = new RandomGhost(ghostStartCoord, _mockSelector.Object);
         var gameState = new GameState(

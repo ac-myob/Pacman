@@ -1,5 +1,8 @@
 using System.Text;
+using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
+using Pacman.Business.View;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;
@@ -46,4 +49,17 @@ public static class GameStateExtensions
 
     public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) =>
        new MovableEntity[] {gameState.Pac}.Concat(gameState.Ghosts);
+
+    public static void AddGhost(this GameState gameState, GhostType ghostType, Coordinate coordinate, IReader reader, IWriter writer)
+    {
+        MovableEntity newGhost = ghostType switch
+        {
+            GhostType.Random => new RandomGhost(coordinate, new RandomSelector<Coordinate>()),
+            GhostType.Greedy => new GreedyGhost(coordinate, gameState.Pac),
+            GhostType.PathFinding => new PathFindingGhost(coordinate, gameState.Pac),
+            _ => throw new ArgumentOutOfRangeException(nameof(ghostType), ghostType, null)
+        };
+        
+        gameState.Ghosts.Add(newGhost);
+    }
 }
