@@ -111,7 +111,7 @@ public class GameServiceTests
         foreach (var movableEntity in movableEntities)
             movableEntity.Move(gameState);
 
-        _gameService.ResetGameState(gameState);
+        GameService.ResetGameState(gameState);
         var actualMovableEntityStartCoords = gameState.GetMovableEntities().Select(e => e.Coordinate);
         
         Assert.DoesNotContain(new Coordinate(2, 0), gameState.Pellets.Keys);

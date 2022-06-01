@@ -86,7 +86,7 @@ public class GameService
         };
     }
 
-    public void ResetGameState(GameState gameState)
+    public static void ResetGameState(GameState gameState)
     {
         foreach (var movableEntity in gameState.GetMovableEntities())
             movableEntity.ResetCoordinate();
