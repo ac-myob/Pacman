@@ -15,4 +15,8 @@ public static class Constants
     public const char PacStart = '◯';
     public const char Blank = ' ';
     public const string GameFilepath = "../../../../Pacman/Games/GameMap.txt";
+    public const char PacUp = 'V';
+    public const char PacDown = '^';
+    public const char PacLeft = '>';
+    public const char PacRight = '<';
 }

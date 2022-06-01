@@ -118,6 +118,28 @@ public class PacTests
         Assert.Empty(gameState.Pellets);
     }
 
+    [Theory]
+    [InlineData(Constants.UpKey, Constants.PacUp)]
+    [InlineData(Constants.DownKey, Constants.PacDown)]
+    [InlineData(Constants.LeftKey, Constants.PacLeft)]
+    [InlineData(Constants.RightKey, Constants.PacRight)]
+    public void Move_ShouldUpdatePacSymbolBasedOnDirection_WhenKeyPressed(string keyPress, char expectedSymbol)
+    {
+        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
+        var gameState = new GameState(
+            new Size(3, 4), 
+            pac,
+            Array.Empty<Wall>(), 
+            new Dictionary<Coordinate, Pellet>(),
+            Array.Empty<MovableEntity>()
+        );
+        _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
+
+        pac.Move(gameState);
+        
+        Assert.Equal(expectedSymbol, pac.Symbol);
+    }
+
     private static IEnumerable<object[]> PrimitiveMoveTestData()
     {
         yield return new object[]

@@ -17,12 +17,13 @@ public class Pac : MovableEntity
     
     public override void Move(GameState gameState)
     {
+        string keyPress;
         bool blockedByWall;
         Coordinate newCoord;
         
         do
         {
-            var keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
+            keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
             var chosenDirection = _getDirection(keyPress);
             newCoord = gameState.GetNewCoord(Coordinate, chosenDirection, gameState.Walls);
             blockedByWall = newCoord == Coordinate;
@@ -32,6 +33,7 @@ public class Pac : MovableEntity
         } while (blockedByWall);
 
         gameState.Pellets.Remove(newCoord);
+        _updateSymbol(keyPress);
         Coordinate = newCoord;
     }
 
@@ -43,6 +45,18 @@ public class Pac : MovableEntity
             Constants.DownKey => Direction.South,
             Constants.LeftKey => Direction.West,
             Constants.RightKey => Direction.East,
+            _ => throw new ArgumentOutOfRangeException(keyPress)
+        };
+    }
+
+    private void _updateSymbol(string keyPress)
+    {
+        Symbol = keyPress switch
+        {
+            Constants.UpKey => Constants.PacUp,
+            Constants.DownKey => Constants.PacDown,
+            Constants.LeftKey => Constants.PacLeft,
+            Constants.RightKey => Constants.PacRight,
             _ => throw new ArgumentOutOfRangeException(keyPress)
         };
     }
