@@ -22,6 +22,7 @@ public class PathFindingGhost : MovableEntity
         
         Coordinate[] dequeuedCoords;
         Coordinate lastDequeuedCoord;
+        var visitedCoords = new HashSet<Coordinate>();
         
         do
         {
@@ -40,13 +41,15 @@ public class PathFindingGhost : MovableEntity
             {
                 var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstacles);
                 
-                if (currCoord == lastDequeuedCoord) continue;
+                if (currCoord == lastDequeuedCoord || visitedCoords.Contains(currCoord)) continue;
 
+                visitedCoords.Add(currCoord);
+                
                 possiblePaths.Enqueue(dequeuedCoords.Length < 2
                     ? dequeuedCoords.Append(currCoord).ToArray()
                     : new[] {dequeuedCoords.First(), currCoord});
             }
-            
+
         } while (lastDequeuedCoord != _pac.Coordinate);
         
         Coordinate = dequeuedCoords.First();
