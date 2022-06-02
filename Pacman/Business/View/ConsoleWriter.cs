@@ -20,7 +20,6 @@ public class ConsoleWriter : IWriter
                     Colour.Blue => ConsoleColor.Blue,
                     Colour.Yellow => ConsoleColor.Yellow,
                     Colour.Green => ConsoleColor.Green,
-                    Colour.White => ConsoleColor.White,
                     _ => throw new ArgumentOutOfRangeException()
                 };
 
