@@ -36,11 +36,14 @@ public class GameStateTests
     }
     
     [Theory]
-    [InlineData(GhostType.Random, typeof(RandomGhost))]
-    [InlineData(GhostType.Greedy, typeof(GreedyGhost))]
-    [InlineData(GhostType.PathFinding, typeof(PathFindingGhost))]
-    public void AddGhost_AddsGhostToGhostEnumerable_WhenGivenGhostType(GhostType ghostType, Type typeOfGhost)
+    [InlineData(1, typeof(RandomGhost))]
+    [InlineData(2, typeof(GreedyGhost))]
+    [InlineData(3, typeof(PathFindingGhost))]
+    public void AddGhost_AddsGhostToGhostEnumerable_WhenGivenRoundNumber(int round, Type typeOfGhost)
     {
+        var expectedStartCoord = new Coordinate(14, 11);
+        var mockSelector = new Mock<ISelector<Coordinate>>();
+        mockSelector.Setup(_ => _.Select(It.IsAny<IEnumerable<Coordinate>>())).Returns(expectedStartCoord);
         var gameState = new GameState(
             It.IsAny<Size>(),
             new Pac(new Coordinate(), It.IsAny<IReader>(), It.IsAny<IWriter>()),
@@ -53,10 +56,12 @@ public class GameStateTests
                 new PathFindingGhost(new Coordinate(), It.IsAny<Pac>())
             });
         var expectedTypes = gameState.MovableEntities.Select(e => e.GetType()).Append(typeOfGhost).ToArray();
-        
-        gameState.AddGhost(ghostType, new Coordinate());
+        for (var i = 0; i < round - 1; i++) gameState.IncreaseRound();
+
+        gameState.AddGhost(mockSelector.Object);
         var actualTypes = gameState.MovableEntities.Select(e => e.GetType()).ToArray();
 
+        Assert.Equal(expectedStartCoord, gameState.Ghosts.Last().Coordinate);
         Assert.Equal(expectedTypes, actualTypes);
     }
 }

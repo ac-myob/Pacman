@@ -9,6 +9,7 @@ public class Pac : MovableEntity
     private readonly Query _query;
     private readonly IWriter _writer;
     private int _lives = Constants.PacStartingLives;
+    public int Lives => _lives;
 
     public Pac(Coordinate coordinate, IReader reader, IWriter writer) : base(coordinate, Constants.PacStart)
     {
@@ -63,6 +64,4 @@ public class Pac : MovableEntity
     }
     
     public void ReduceLife() => _lives = Math.Max(_lives - 1, 0);
-
-    public bool IsAlive() => _lives > 0;
 }

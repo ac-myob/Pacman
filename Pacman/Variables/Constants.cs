@@ -8,11 +8,12 @@ public static class Constants
     public const string RightKey = "RightArrow";
     public const string ValidKeysRegex = $"^({UpKey}|{DownKey}|{LeftKey}|{RightKey})$";
     public const char Wall = '▩';
-    public const char Pellet = '•';
+    public const char Pellet = '·';
     public const char GreedyGhost = 'ᗣ';
     public const char RandomGhost = 'ᓆ';
     public const char PathFindingGhost = 'ᔬ';
     public const char PacStart = '◯';
+    public const char Heart = '♥';
     public const char Blank = ' ';
     public const string GameFilepath = "../../../../Pacman/Games/GameMap.txt";
     public const char PacUp = 'V';
@@ -20,4 +21,6 @@ public static class Constants
     public const char PacLeft = '>';
     public const char PacRight = '<';
     public const int PacStartingLives = 3;
+    public const int StartRound = 1;
+    public const int MaxRounds = 3;
 }

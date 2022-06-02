@@ -59,7 +59,7 @@ public class GameService
                         break;
                 }
             }
-
+        
         return new GameState(size, pac, walls, pellets, ghosts);
     }
 
@@ -84,11 +84,5 @@ public class GameService
             > 1 => throw new InvalidFileException("More than one Pacman symbol was found in file."),
             _ => pacCoord
         };
-    }
-
-    public static void ResetGameState(GameState gameState)
-    {
-        foreach (var movableEntity in gameState.MovableEntities)
-            movableEntity.ResetCoordinate();
     }
 }

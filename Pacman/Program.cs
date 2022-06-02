@@ -1,3 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
+﻿using Pacman.Business.Control;
+using Pacman.Business.View;
 
-Console.WriteLine("Hello, World!");
+var consoleReader = new ConsoleReader();
+var consoleWriter = new ConsoleWriter();
+var gameEngine = new GameEngine(consoleReader, consoleWriter);
+
+gameEngine.Run();

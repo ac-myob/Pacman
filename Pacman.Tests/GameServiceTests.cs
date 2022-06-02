@@ -101,20 +101,20 @@ public class GameServiceTests
         Assert.Equal(expectedPelletCoords, actualGameState.Pellets.Select(p => p.Coordinate));
     }
 
-    [Fact]
-    public void ResetGameState_SetsAllMovableEntitiesToTheirStartCoordinates()
-    {
-        var gameState = _gameService.GetNewGameState(TestGame);
-        var movableEntities = gameState.MovableEntities.ToArray();
-        var expectedMovableEntityStartCoords = movableEntities.Select(e => e.Coordinate);
-        _mockReader.Setup(_ => _.ReadKey()).Returns(Constants.UpKey);
-        foreach (var movableEntity in movableEntities)
-            movableEntity.Move(gameState);
-
-        GameService.ResetGameState(gameState);
-        var actualMovableEntityStartCoords = gameState.MovableEntities.Select(e => e.Coordinate);
-        
-        Assert.DoesNotContain(new Coordinate(2, 0), gameState.Pellets.Select(p => p.Coordinate));
-        Assert.Equal(expectedMovableEntityStartCoords, actualMovableEntityStartCoords);
-    }
+    // [Fact]
+    // public void ResetGameState_SetsAllMovableEntitiesToTheirStartCoordinates()
+    // {
+    //     var gameState = _gameService.GetNewGameState(TestGame);
+    //     var movableEntities = gameState.MovableEntities.ToArray();
+    //     var expectedMovableEntityStartCoords = movableEntities.Select(e => e.Coordinate);
+    //     _mockReader.Setup(_ => _.ReadKey()).Returns(Constants.UpKey);
+    //     foreach (var movableEntity in movableEntities)
+    //         movableEntity.Move(gameState);
+    //
+    //     GameService.ResetGameState(gameState);
+    //     var actualMovableEntityStartCoords = gameState.MovableEntities.Select(e => e.Coordinate);
+    //     
+    //     Assert.DoesNotContain(new Coordinate(2, 0), gameState.Pellets.Select(p => p.Coordinate));
+    //     Assert.Equal(expectedMovableEntityStartCoords, actualMovableEntityStartCoords);
+    // }
 }

@@ -7,8 +7,10 @@ namespace Pacman.Business.Model;
 
 public class GameState
 {
-    private readonly IDictionary<Coordinate, Pellet> _pellets;
+    private IDictionary<Coordinate, Pellet> _pellets;
+    private readonly IList<Pellet> _removedPellets = new List<Pellet>();
     public Size Size { get; }
+    public int Round { get; private set; } = Constants.StartRound;
     public Pac Pac { get; }
     public IEnumerable<MovableEntity> MovableEntities => new MovableEntity[] {Pac}.Concat(Ghosts);
     public IEnumerable<Entity> Walls { get; }
@@ -24,18 +26,42 @@ public class GameState
         Ghosts = ghosts;
     }
 
-    public void RemovePellet(Coordinate coordinate) => _pellets.Remove(coordinate);
-
-    public void AddGhost(GhostType ghostType, Coordinate coordinate)
+    public void RemovePellet(Coordinate coordinate)
     {
-        MovableEntity newGhost = ghostType switch
+        if (_pellets.ContainsKey(coordinate))
+            _removedPellets.Add(_pellets[coordinate]);
+        
+        _pellets.Remove(coordinate);
+    }
+
+    public void ResetPellets() => _pellets = _removedPellets.ToDictionary(p => p.Coordinate, p => p);
+
+    public void AddGhost(ISelector<Coordinate> selector)
+    {
+        var ghostTypes = Enum.GetValues(typeof(GhostType)).Cast<GhostType>();
+        var chosenGhostType = ghostTypes.ElementAt(Round - 1);
+        var coordinate = selector.Select(Pellets.Select(p => p.Coordinate));
+        
+        MovableEntity newGhost = chosenGhostType switch
         {
-            GhostType.Random => new RandomGhost(coordinate, new RandomSelector<Coordinate>()),
+            GhostType.Random => new RandomGhost(coordinate, selector),
             GhostType.Greedy => new GreedyGhost(coordinate, Pac),
             GhostType.PathFinding => new PathFindingGhost(coordinate, Pac),
-            _ => throw new ArgumentOutOfRangeException(nameof(ghostType), ghostType, null)
+            _ => throw new ArgumentOutOfRangeException()
         };
 
         Ghosts = Ghosts.Append(newGhost);
     }
+
+    public void ResetMovableEntities()
+    {
+        foreach (var movableEntity in MovableEntities)
+            movableEntity.ResetCoordinate();
+    }
+    
+    public bool IsPacOnGhost() => Ghosts.Any(g => g.Coordinate == Pac.Coordinate);
+
+    public void IncreaseRound() => Round = Math.Min(Round + 1, Constants.MaxRounds);
+
+    public bool FinishedGame() => Round == Constants.MaxRounds;
 }
