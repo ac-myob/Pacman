@@ -21,6 +21,7 @@ public class RandomGhost : MovableEntity
             select gameState.GetNewCoord(Coordinate, direction, obstacles) into currentCoord 
             where currentCoord != Coordinate select currentCoord).ToArray();
 
-        Coordinate = _selector.Select(posCoords);
+        if (posCoords.Any())
+            Coordinate = _selector.Select(posCoords);
     }
 }
