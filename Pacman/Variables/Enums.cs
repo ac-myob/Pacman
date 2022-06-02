@@ -14,3 +14,12 @@ public enum GhostType
     Greedy,
     PathFinding
 }
+
+public enum Colour
+{
+    Red,
+    Blue,
+    Yellow,
+    Green,
+    White
+}
