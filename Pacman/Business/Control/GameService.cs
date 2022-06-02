@@ -34,7 +34,7 @@ public class GameService
         var pac = new Pac(_getPacCoord(fileLines, size), _reader, _writer);
         var walls = new List<Wall>();
         var ghosts = new List<MovableEntity>();
-        var pellets = new Dictionary<Coordinate, Pellet>();
+        var pellets = new List<Pellet>();
         
         for (var l = 0; l < length; l++)
             for (var w = 0; w < width; w++)
@@ -55,7 +55,7 @@ public class GameService
                         ghosts.Add(new PathFindingGhost(currentCoord, pac));
                         break;
                     case Constants.Pellet:
-                        pellets.Add(currentCoord, new Pellet(currentCoord));
+                        pellets.Add(new Pellet(currentCoord));
                         break;
                 }
             }
@@ -88,7 +88,7 @@ public class GameService
 
     public static void ResetGameState(GameState gameState)
     {
-        foreach (var movableEntity in gameState.GetMovableEntities())
+        foreach (var movableEntity in gameState.MovableEntities)
             movableEntity.ResetCoordinate();
     }
 }

@@ -23,7 +23,7 @@ public class GreedyGhostTests
             mapSize,
             pac,
             Array.Empty<Wall>(),
-            new Dictionary<Coordinate, Pellet>(), 
+            new List<Pellet>(), 
             Array.Empty<MovableEntity>()
             );
 
@@ -43,7 +43,7 @@ public class GreedyGhostTests
             mapSize, 
             pac, 
             walls, 
-            new Dictionary<Coordinate, Pellet>(),
+            new List<Pellet>(),
             Array.Empty<MovableEntity>()
             );
 
@@ -63,7 +63,7 @@ public class GreedyGhostTests
             mapSize, 
             pac, 
             Array.Empty<Wall>(), 
-            new Dictionary<Coordinate, Pellet>(),
+            new List<Pellet>(),
             ghosts
             );
 

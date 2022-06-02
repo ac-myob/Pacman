@@ -24,17 +24,17 @@ public class PacTests
             new Size(3, 3),
             pac,
             Array.Empty<Wall>(),
-            new Dictionary<Coordinate, Pellet>(),
+            new List<Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
         pac.Move(gameState);
-        
+
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
     }
-    
+
     [Theory]
     [MemberData(nameof(WrappingTestData))]
     public void Move_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
@@ -45,13 +45,13 @@ public class PacTests
             mapSize,
             pac,
             Array.Empty<Wall>(),
-            new Dictionary<Coordinate, Pellet>(),
+            new List<Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
         pac.Move(gameState);
-        
+
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, pac.Coordinate);
     }
@@ -66,38 +66,38 @@ public class PacTests
             new Size(3, 3),
             pac,
             Array.Empty<Wall>(),
-            new Dictionary<Coordinate, Pellet>(),
+            new List<Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
-        
+
         pac.Move(gameState);
-        
+
         _writer.Verify(_ => _.Write(Messages.InvalidKeyPress), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
         Assert.Equal(new Coordinate(1, 0), pac.Coordinate);
     }
-    
+
     [Fact]
     public void Move_ShouldContinuouslyQueryForKey_WhenMovingIntoAWall()
     {
         var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
         var gameState = new GameState(
-            new Size(3, 3), 
+            new Size(3, 3),
             pac,
-            new Wall[] {new (new Coordinate(1, 0))}, 
-            new Dictionary<Coordinate, Pellet>(),
+            new Wall[] {new(new Coordinate(1, 0))},
+            new List<Pellet>(),
             Array.Empty<MovableEntity>()
-            );
+        );
         _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);
-        
+
         pac.Move(gameState);
-        
+
         _writer.Verify(_ => _.Write(Messages.WallObstruction), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
         Assert.Equal(new Coordinate(1, 2), pac.Coordinate);
     }
-    
+
     [Theory]
     [MemberData(nameof(RemovePelletTestData))]
     public void Move_ShouldRemovePelletAtNewCoordinate(
@@ -105,16 +105,16 @@ public class PacTests
     {
         var pac = new Pac(pacCoord, _reader.Object, _writer.Object);
         var gameState = new GameState(
-            mapSize, 
+            mapSize,
             pac,
-            Array.Empty<Wall>(), 
-            new Dictionary<Coordinate, Pellet> {{pelletCoord, new Pellet(pelletCoord)}},
+            Array.Empty<Wall>(),
+            new List<Pellet> {new(pelletCoord)},
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
         pac.Move(gameState);
-        
+
         Assert.Empty(gameState.Pellets);
     }
 
@@ -127,16 +127,16 @@ public class PacTests
     {
         var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
         var gameState = new GameState(
-            new Size(3, 4), 
+            new Size(3, 4),
             pac,
-            Array.Empty<Wall>(), 
-            new Dictionary<Coordinate, Pellet>(),
+            Array.Empty<Wall>(),
+            new List<Pellet>(),
             Array.Empty<MovableEntity>()
         );
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
         pac.Move(gameState);
-        
+
         Assert.Equal(expectedSymbol, pac.Symbol);
     }
 
@@ -148,21 +148,21 @@ public class PacTests
             Constants.UpKey,
             new Coordinate(1, 0)
         };
-        
+
         yield return new object[]
         {
             new Coordinate(1, 1),
             Constants.DownKey,
             new Coordinate(1, 2)
         };
-        
+
         yield return new object[]
         {
             new Coordinate(1, 1),
             Constants.LeftKey,
             new Coordinate(0, 1)
         };
-        
+
         yield return new object[]
         {
             new Coordinate(1, 1),
@@ -170,7 +170,7 @@ public class PacTests
             new Coordinate(2, 1)
         };
     }
-    
+
     private static IEnumerable<object[]> WrappingTestData()
     {
         yield return new object[]
@@ -180,7 +180,7 @@ public class PacTests
             Constants.UpKey,
             new Coordinate(0, 1)
         };
-        
+
         yield return new object[]
         {
             new Coordinate(1, 1),
@@ -188,7 +188,7 @@ public class PacTests
             Constants.DownKey,
             new Coordinate(1, 0)
         };
-        
+
         yield return new object[]
         {
             new Coordinate(0, 0),
@@ -196,7 +196,7 @@ public class PacTests
             Constants.LeftKey,
             new Coordinate(1, 0)
         };
-        
+
         yield return new object[]
         {
             new Coordinate(1, 1),
@@ -215,7 +215,7 @@ public class PacTests
             Constants.RightKey,
             new Coordinate(1, 0)
         };
-        
+
         yield return new object[]
         {
             new Size(2, 2),

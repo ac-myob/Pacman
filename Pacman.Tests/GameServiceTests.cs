@@ -98,23 +98,23 @@ public class GameServiceTests
         var expectedPelletCoords = new[] {new Coordinate(0, 0), new Coordinate(1, 0), new Coordinate(2, 0)};
         var actualGameState = _gameService.GetNewGameState(TestGame);
         
-        Assert.Equal(expectedPelletCoords, actualGameState.Pellets.Keys);
+        Assert.Equal(expectedPelletCoords, actualGameState.Pellets.Select(p => p.Coordinate));
     }
 
     [Fact]
     public void ResetGameState_SetsAllMovableEntitiesToTheirStartCoordinates()
     {
         var gameState = _gameService.GetNewGameState(TestGame);
-        var movableEntities = gameState.GetMovableEntities().ToArray();
+        var movableEntities = gameState.MovableEntities.ToArray();
         var expectedMovableEntityStartCoords = movableEntities.Select(e => e.Coordinate);
         _mockReader.Setup(_ => _.ReadKey()).Returns(Constants.UpKey);
         foreach (var movableEntity in movableEntities)
             movableEntity.Move(gameState);
 
         GameService.ResetGameState(gameState);
-        var actualMovableEntityStartCoords = gameState.GetMovableEntities().Select(e => e.Coordinate);
+        var actualMovableEntityStartCoords = gameState.MovableEntities.Select(e => e.Coordinate);
         
-        Assert.DoesNotContain(new Coordinate(2, 0), gameState.Pellets.Keys);
+        Assert.DoesNotContain(new Coordinate(2, 0), gameState.Pellets.Select(p => p.Coordinate));
         Assert.Equal(expectedMovableEntityStartCoords, actualMovableEntityStartCoords);
     }
 }
