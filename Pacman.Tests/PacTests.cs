@@ -73,7 +73,7 @@ public class PacTests
         
         pac.Move(gameState);
         
-        _writer.Verify(_ => _.WriteLine(Messages.InvalidKeyPress), Times.Once);
+        _writer.Verify(_ => _.Write(Messages.InvalidKeyPress), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
         Assert.Equal(new Coordinate(1, 0), pac.Coordinate);
     }
@@ -93,7 +93,7 @@ public class PacTests
         
         pac.Move(gameState);
         
-        _writer.Verify(_ => _.WriteLine(Messages.WallObstruction), Times.Once);
+        _writer.Verify(_ => _.Write(Messages.WallObstruction), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
         Assert.Equal(new Coordinate(1, 2), pac.Coordinate);
     }

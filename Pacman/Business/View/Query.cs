@@ -24,7 +24,7 @@ public class Query
             keyPress = _reader.ReadKey();
             validKeyPress = Regex.IsMatch(keyPress, validKeysRegex);
             
-            if (!validKeyPress) _writer.WriteLine(invalidMessage);
+            if (!validKeyPress) _writer.Write(invalidMessage);
 
         } while (!validKeyPress);
 

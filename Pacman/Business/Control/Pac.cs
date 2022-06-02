@@ -28,7 +28,7 @@ public class Pac : MovableEntity
             newCoord = gameState.GetNewCoord(Coordinate, chosenDirection, gameState.Walls);
             blockedByWall = newCoord == Coordinate;
 
-            if (blockedByWall) _writer.WriteLine(Messages.WallObstruction);
+            if (blockedByWall) _writer.Write(Messages.WallObstruction);
 
         } while (blockedByWall);
 
