@@ -19,4 +19,5 @@ public static class Constants
     public const char PacDown = '^';
     public const char PacLeft = '>';
     public const char PacRight = '<';
+    public const int PacStartingLives = 3;
 }
