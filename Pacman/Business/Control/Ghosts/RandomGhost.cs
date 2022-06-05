@@ -4,24 +4,24 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public class RandomGhost : MovableEntity
+public record RandomGhost(Coordinate Coordinate, ISelector<Coordinate> Selector, int Id) :
+    MovableEntity(Coordinate, Constants.RandomGhost, Id)
 {
-    private readonly ISelector<Coordinate> _selector;
-
-    public RandomGhost(Coordinate coordinate, ISelector<Coordinate> selector) : base(coordinate, Constants.RandomGhost)
+    public override GameState Move(GameState gameState)
     {
-        _selector = selector;
-    }
-
-    public override void Move(GameState gameState)
-    {
-        var obstacles = gameState.Walls.Concat(gameState.Ghosts).ToArray();
+        var obstacles = gameState.Walls.Cast<Entity>().Concat(gameState.Ghosts).ToArray();
         var posCoords = 
             (from Direction direction in Enum.GetValues(typeof(Direction)) 
             select gameState.GetNewCoord(Coordinate, direction, obstacles) into currentCoord 
             where currentCoord != Coordinate select currentCoord).ToArray();
 
-        if (posCoords.Any())
-            Coordinate = _selector.Select(posCoords);
+        if (!posCoords.Any()) return gameState;
+
+        var newCoord = Selector.Select(posCoords);
+        
+        return gameState with
+        {
+            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new RandomGhost(newCoord, Selector, Id))
+        };
     }
 }

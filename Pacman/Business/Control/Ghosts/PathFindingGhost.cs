@@ -3,20 +3,15 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public class PathFindingGhost : MovableEntity
+public record PathFindingGhost(Coordinate Coordinate, int Id) : 
+    MovableEntity(Coordinate, Constants.PathFindingGhost, Id)
 {
-    private readonly Pac _pac;
-
-    public PathFindingGhost(Coordinate coordinate, Pac pac) : base(coordinate, Constants.PathFindingGhost)
+    public override GameState Move(GameState gameState)
     {
-        _pac = pac;
-    }
+        // var ghostCoord = gameState.GetMovableEntities().ElementAt(Id).Coordinate;
+        if (gameState.Pac.Coordinate == Coordinate) return gameState;
 
-    public override void Move(GameState gameState)
-    {
-        if (_pac.Coordinate == Coordinate) return;
-        
-        var obstacles = gameState.Walls.Concat(gameState.Ghosts).ToArray();
+        var obstacles = gameState.Walls.Cast<Entity>().Concat(gameState.Ghosts).ToArray();
         var possiblePaths = new Queue<Coordinate[]>();
         possiblePaths.Enqueue(Array.Empty<Coordinate>());
         
@@ -34,7 +29,7 @@ public class PathFindingGhost : MovableEntity
             }
             catch (InvalidOperationException)
             {
-                return;
+                return gameState;
             }
 
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
@@ -50,8 +45,11 @@ public class PathFindingGhost : MovableEntity
                     : new[] {dequeuedCoords.First(), currCoord});
             }
 
-        } while (lastDequeuedCoord != _pac.Coordinate);
-        
-        Coordinate = dequeuedCoords.First();
+        } while (lastDequeuedCoord != gameState.Pac.Coordinate);
+
+        return gameState with
+        {
+            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new PathFindingGhost(dequeuedCoords.First(), Id))
+        }; 
     }
 }
