@@ -24,9 +24,6 @@ public record GreedyGhost(Coordinate Coordinate, int Id) : MovableEntity(Coordin
             bestCoord = currentCoord;
         }
 
-        return gameState with
-        {
-            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new GreedyGhost(bestCoord, Id))
-        };
+        return gameState.UpdateGhostCoordinate(Id, bestCoord);
     }
 }

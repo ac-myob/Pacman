@@ -11,7 +11,7 @@ using Xunit;
 
 namespace Pacman.Tests;
 
-public class GameStateExtensionsTests
+public class GameStateQueryTests
 {
     private readonly GameState _gameState = new(
         It.IsAny<Size>(),
@@ -97,39 +97,6 @@ public class GameStateExtensionsTests
         var actualBool = gameState.IsPacOnGhost();
 
         Assert.Equal(expectedBool, actualBool);
-    }
-
-    [Fact]
-    public void UpdatePellets_ReturnsGameStateWithPelletsTraversedByPacmanRemoved_WhenGhostNotOnPellet()
-    {
-        var pacCoord = new Coordinate(0, 0);
-        var ghostCoord = new Coordinate(1, 0);
-        var gameState = _gameState with
-        {
-            Pac = _pac with { Coordinate = pacCoord },
-            Ghosts = new MovableEntity[] { new GreedyGhost(ghostCoord, It.IsAny<int>()) },
-            Pellets = new Pellet[] {new(pacCoord), new(ghostCoord)}
-        };
-
-        var actualGameState = gameState.UpdatePellets();
-        
-        Assert.Equal(new Pellet[] {new(ghostCoord)}, actualGameState.Pellets);
-    }
-    
-    [Fact]
-    public void UpdatePellets_ReturnsOriginalGameState_WhenTraversingPelletOccupiedByAGhost()
-    {
-        var coord = new Coordinate(0, 0);
-        var gameState = _gameState with
-        {
-            Pac = _pac with { Coordinate = coord },
-            Ghosts = new MovableEntity[] { new GreedyGhost(coord, It.IsAny<int>()) },
-            Pellets = new Pellet[] {new(coord)}
-        };
-
-        var actualGameState = gameState.UpdatePellets();
-        
-        Assert.Equal(new Pellet[] {new(coord)}, actualGameState.Pellets);
     }
 
     private static IEnumerable<object[]> IsPacOnGhostTestData()

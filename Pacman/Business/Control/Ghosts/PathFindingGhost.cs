@@ -47,9 +47,6 @@ public record PathFindingGhost(Coordinate Coordinate, int Id) :
 
         } while (lastDequeuedCoord != gameState.Pac.Coordinate);
 
-        return gameState with
-        {
-            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new PathFindingGhost(dequeuedCoords.First(), Id))
-        }; 
+        return gameState.UpdateGhostCoordinate(Id, dequeuedCoords.First());
     }
 }

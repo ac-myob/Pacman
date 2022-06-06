@@ -21,9 +21,6 @@ public record RandomGhost(Coordinate Coordinate, int Id, ISelector<Coordinate> S
 
         var newCoord = Selector.SelectFrom(posCoords);
         
-        return gameState with
-        {
-            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new RandomGhost(newCoord, Id, Selector))
-        };
+        return gameState.UpdateGhostCoordinate(Id, newCoord);
     }
 }

@@ -4,7 +4,7 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public static class GameStateExtensions
+public static class GameStateQuery
 {
     public static Coordinate GetNewCoord(
         this GameState gameState, Coordinate coordinate, Direction direction, IEnumerable<Entity> obstacles)
@@ -50,14 +50,4 @@ public static class GameStateExtensions
         gameState.Ghosts.Any(g => g.Coordinate == gameState.Pac.Coordinate);
 
     public static bool IsGameFinished(this GameState gameState) => gameState.Round > Constants.MaxRounds;
-
-    public static GameState UpdatePellets(this GameState gameState)
-    {
-        if (gameState.IsPacOnGhost()) return gameState;
-        
-        return gameState with
-        {
-            Pellets = gameState.Pellets.Where(p => p.Coordinate != gameState.Pac.Coordinate)
-        };
-    }
 }
