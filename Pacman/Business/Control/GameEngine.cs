@@ -1,4 +1,3 @@
-using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Variables;
@@ -34,34 +33,38 @@ public class GameEngine
     public void Run()
     {
         _gameState = _gameService.GetNewGameState(Constants.GameFilepath);
+        _displayMap();
         
-        while (!_gameState.FinishedGame() && _gameState.Pac.Lives > 0)
+        do
         {
-            
-            foreach (var movableEntity in _gameState.MovableEntities)
-            {
-                _writer.Clear();
-                _writer.Write(Messages.GetTurnInfo(_gameState) + _gameState.GetString(), _colourMapping);
-                movableEntity.Move(_gameState);
-            }
-            
+            foreach (var movableEntity in _gameState.GetMovableEntities())
+                _gameState = movableEntity.Move(_gameState);
+
+            _gameState = _gameState.UpdatePellets();
+            _displayMap();
+
             if (_gameState.IsPacOnGhost())
             {
                 _writer.Write(Messages.GhostCollision);
                 _reader.ReadKey();
-                _gameState.ResetMovableEntities();
-                _gameState.Pac.ReduceLife();
+                _gameState = _gameService.GetResetGameState(_gameState);
+                _displayMap();
+            }
+            else if (!_gameState.Pellets.Any())
+            {
+                _writer.Write(Messages.RoundComplete);
+                _reader.ReadKey();
+                _gameState = _gameService.GetNextRoundGameState(_gameState);
+                _displayMap();
             }
 
-            if (!_gameState.Pellets.Any())
-            {
-                _gameState.ResetMovableEntities();
-                _gameState.ResetPellets();
-                _gameState.IncreaseRound();
-                _gameState.AddGhost(new RandomSelector<Coordinate>());
-            }
-        }
-        _writer.Write(Messages.GetTurnInfo(_gameState) + _gameState.GetString(), _colourMapping);
+        } while (!_gameState.IsGameFinished() && _gameState.Pac.Lives > 0);
+        
         _writer.Write(Messages.GetGameOutcome(_gameState));
+    }
+    
+    private void _displayMap() {
+        _writer.Clear();
+        _writer.Write(Messages.GetTurnInfo(_gameState) + _gameState.GetString(), _colourMapping);
     }
 }
