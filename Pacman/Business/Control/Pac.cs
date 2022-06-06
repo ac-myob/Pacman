@@ -4,42 +4,41 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public class Pac : MovableEntity
+public record Pac(Coordinate Coordinate, char Symbol, int Id, int Lives, IReader Reader, IWriter Writer) : 
+    MovableEntity(Coordinate, Symbol, Id)
 {
-    private readonly Query _query;
-    private readonly IWriter _writer;
-    private int _lives = Constants.PacStartingLives;
-    public int Lives => _lives;
+    private IWriter Writer { get; } = Writer;
+    private IReader Reader { get; } = Reader;
 
-    public Pac(Coordinate coordinate, IReader reader, IWriter writer) : base(coordinate, Constants.PacStart)
+    public override GameState Move(GameState gameState)
     {
-        _query = new Query(reader, writer);
-        _writer = writer;
-    }
-    
-    public override void Move(GameState gameState)
-    {
+        var query = new Query(Reader, Writer);
         string keyPress;
         bool blockedByWall;
         Coordinate newCoord;
         
         do
         {
-            keyPress = _query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
+            keyPress = query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
             var chosenDirection = _getDirection(keyPress);
             newCoord = gameState.GetNewCoord(Coordinate, chosenDirection, gameState.Walls);
             blockedByWall = newCoord == Coordinate;
 
-            if (blockedByWall) _writer.Write(Messages.WallObstruction);
+            if (blockedByWall) Writer.Write(Messages.WallObstruction);
 
         } while (blockedByWall);
 
-        gameState.RemovePellet(newCoord);
-        _updateSymbol(keyPress);
-        Coordinate = newCoord;
+        return gameState with
+        {
+            Pac = gameState.Pac with
+            {
+                Coordinate = newCoord,
+                Symbol = _getSymbol(keyPress)
+            }
+        };
     }
 
-    private Direction _getDirection(string keyPress)
+    private static Direction _getDirection(string keyPress)
     {
         return keyPress switch
         {
@@ -51,9 +50,9 @@ public class Pac : MovableEntity
         };
     }
 
-    private void _updateSymbol(string keyPress)
+    private static char _getSymbol(string keyPress)
     {
-        Symbol = keyPress switch
+        return keyPress switch
         {
             Constants.UpKey => Constants.PacUp,
             Constants.DownKey => Constants.PacDown,
@@ -62,6 +61,4 @@ public class Pac : MovableEntity
             _ => throw new ArgumentOutOfRangeException(keyPress)
         };
     }
-    
-    public void ReduceLife() => _lives = Math.Max(_lives - 1, 0);
 }

@@ -27,12 +27,12 @@ public static class GameStateExtensions
     {
         var (width, length) = gameState.Size;
         var res = new StringBuilder(new string(Constants.Blank, length * width));
-        var entities = gameState.Pellets.
+        var entities = gameState.Pellets.Cast<Entity>().
             Concat(gameState.Walls).
-            Concat(gameState.MovableEntities).
+            Concat(gameState.GetMovableEntities()).
             OrderBy(o => o.Coordinate.Y).
             ThenBy(o => o.Coordinate.X).
-            ToList();
+            ToArray();
 
         foreach (var entity in entities)
             res[entity.Coordinate.GetRank(width)] = entity.Symbol;
@@ -41,5 +41,23 @@ public static class GameStateExtensions
             res.Insert(width * (l + 1) + l, Environment.NewLine);
 
         return res.ToString();
+    }
+
+    public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) => 
+        gameState.Ghosts.Prepend(gameState.Pac);
+
+    public static bool IsPacOnGhost(this GameState gameState) => 
+        gameState.Ghosts.Any(g => g.Coordinate == gameState.Pac.Coordinate);
+
+    public static bool IsGameFinished(this GameState gameState) => gameState.Round > Constants.MaxRounds;
+
+    public static GameState UpdatePellets(this GameState gameState)
+    {
+        if (gameState.IsPacOnGhost()) return gameState;
+        
+        return gameState with
+        {
+            Pellets = gameState.Pellets.Where(p => p.Coordinate != gameState.Pac.Coordinate)
+        };
     }
 }

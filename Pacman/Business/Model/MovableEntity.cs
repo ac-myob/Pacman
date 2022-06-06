@@ -1,15 +1,7 @@
 namespace Pacman.Business.Model;
 
-public abstract class MovableEntity : Entity
+public abstract record MovableEntity(Coordinate Coordinate, char Symbol, int Id) : Entity(Coordinate, Symbol)
 {
-    private readonly Coordinate _startCoord;
-
-    protected MovableEntity(Coordinate coordinate, char symbol) : base(coordinate, symbol)
-    {
-        _startCoord = coordinate;
-    }
-
-    public abstract void Move(GameState gameState);
-
-    public void ResetCoordinate() => Coordinate = _startCoord;
+    public int Id { get; } = Id;
+    public abstract GameState Move(GameState gameState);
 }

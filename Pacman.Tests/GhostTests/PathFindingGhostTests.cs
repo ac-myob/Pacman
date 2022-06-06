@@ -1,34 +1,43 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
 using Pacman.Business.View;
+using Pacman.Variables;
 using Xunit;
 
-namespace Pacman.Tests;
+namespace Pacman.Tests.GhostTests;
 
 public class PathFindingGhostTests
 {
+    private readonly GameState _gameState = new(
+        It.IsAny<Size>(),
+        It.IsAny<int>(),
+        It.IsAny<Pac>(),
+        Array.Empty<MovableEntity>(),
+        Array.Empty<Wall>(),
+        Array.Empty<Pellet>()
+    );
+    
     [Theory]
     [MemberData(nameof(NoObstaclesTestData))]
     public void Move_MovesGhostTowardPac_GivenNoObstacles(
         Size mapSize, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
-        var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
-        var pathFindingGhost = new PathFindingGhost(ghostCoord, pac);
-        var gameState = new GameState(
-            mapSize,
-            pac,
-            Array.Empty<Wall>(),
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-            );
+        var gameState = _gameState with
+        {
+            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), Constants.PacStartingLives,
+                It.IsAny<IReader>(), It.IsAny<IWriter>()),
+            Size = mapSize,
+            Ghosts = new MovableEntity[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())}
+        };
 
-        pathFindingGhost.Move(gameState);
+        var actualGameState = gameState.Ghosts.Single().Move(gameState);
         
-        Assert.Equal(expectedCoord, pathFindingGhost.Coordinate);
+        Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
@@ -36,19 +45,18 @@ public class PathFindingGhostTests
     public void Move_MovesGhostTowardPac_GivenWalls(
         Size mapSize, IEnumerable<Wall> walls, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
-        var pac = new Pac(pacCoord, It.IsAny<IReader>(), It.IsAny<IWriter>());
-        var pathFindingGhost = new PathFindingGhost(ghostCoord, pac);
-        var gameState = new GameState(
-            mapSize,
-            pac,
-            walls,
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-        );
+        var gameState = _gameState with
+        {            
+            Size = mapSize,
+            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), Constants.PacStartingLives,
+                It.IsAny<IReader>(), It.IsAny<IWriter>()),
+            Ghosts = new MovableEntity[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())},
+            Walls = walls
+        };
 
-        pathFindingGhost.Move(gameState);
+        var actualGameState = gameState.Ghosts.Single().Move(gameState);
         
-        Assert.Equal(expectedCoord, pathFindingGhost.Coordinate);
+        Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
     }
     
     private static IEnumerable<object[]> NoObstaclesTestData()
