@@ -20,7 +20,8 @@ public static class Constants
     public const char PacDown = '^';
     public const char PacLeft = '>';
     public const char PacRight = '<';
-    public const int PacStartingLives = 3;
+    public const int PacStartingLives = 6;
     public const int StartRound = 1;
-    public const int MaxRounds = 3;
+    public const int MaxRounds = 4;
+    public const int StartingId = 0;
 }
