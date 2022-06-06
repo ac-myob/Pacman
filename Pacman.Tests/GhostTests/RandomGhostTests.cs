@@ -41,7 +41,7 @@ public class RandomGhostTests
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
 
-        _mockSelector.Setup(_ => _.Select(Capture.With(match)));
+        _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
         gameState.Ghosts.Single().Move(gameState);
 
         Assert.Equal(expectedPosCoords, actualPosCoords);
@@ -61,7 +61,7 @@ public class RandomGhostTests
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
         
-        _mockSelector.Setup(_ => _.Select(Capture.With(match)));
+        _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
         gameState.Ghosts.Single().Move(gameState);
         
         Assert.Equal(expectedPosCoords, actualPosCoords);
@@ -80,7 +80,7 @@ public class RandomGhostTests
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
         
-        _mockSelector.Setup(_ => _.Select(Capture.With(match)));
+        _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
         gameState.Ghosts.First().Move(gameState);
         
         Assert.Equal(expectedPosCoords, actualPosCoords);

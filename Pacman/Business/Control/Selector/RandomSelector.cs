@@ -2,7 +2,7 @@ namespace Pacman.Business.Control.Selector;
 
 public class RandomSelector<T> : ISelector<T>
 {
-    public T Select(IEnumerable<T> collection)
+    public T SelectFrom(IEnumerable<T> collection)
     {
         var collectionArr = collection.ToArray();
 

@@ -7,6 +7,8 @@ namespace Pacman.Business.Control.Ghosts;
 public record RandomGhost(Coordinate Coordinate, int Id, ISelector<Coordinate> Selector) :
     MovableEntity(Coordinate, Constants.RandomGhost, Id)
 {
+    private ISelector<Coordinate> Selector { get; } = Selector;
+    
     public override GameState Move(GameState gameState)
     {
         var obstacles = gameState.Walls.Cast<Entity>().Concat(gameState.Ghosts).ToArray();
@@ -17,7 +19,7 @@ public record RandomGhost(Coordinate Coordinate, int Id, ISelector<Coordinate> S
 
         if (!posCoords.Any()) return gameState;
 
-        var newCoord = Selector.Select(posCoords);
+        var newCoord = Selector.SelectFrom(posCoords);
         
         return gameState with
         {

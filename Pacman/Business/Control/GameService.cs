@@ -120,7 +120,7 @@ public class GameService
         // If no space to add ghost, don't add ghost
         if (!posNewGhostCoords.Any()) return _initialGameState.Ghosts;
         
-        var newGhostCoord = _selector.Select(posNewGhostCoords);
+        var newGhostCoord = _selector.SelectFrom(posNewGhostCoords);
         var newGhost = GhostFactory.GetGhost(newGhostType, newGhostCoord, _numberSequence.GetNext());
 
         return _initialGameState.Ghosts.Append(newGhost);
