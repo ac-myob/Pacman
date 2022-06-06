@@ -4,7 +4,7 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public record RandomGhost(Coordinate Coordinate, ISelector<Coordinate> Selector, int Id) :
+public record RandomGhost(Coordinate Coordinate, int Id, ISelector<Coordinate> Selector) :
     MovableEntity(Coordinate, Constants.RandomGhost, Id)
 {
     public override GameState Move(GameState gameState)
@@ -21,7 +21,7 @@ public record RandomGhost(Coordinate Coordinate, ISelector<Coordinate> Selector,
         
         return gameState with
         {
-            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new RandomGhost(newCoord, Selector, Id))
+            Ghosts = gameState.Ghosts.Select(g => g.Id != Id ? g : new RandomGhost(newCoord, Id, Selector))
         };
     }
 }

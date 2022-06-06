@@ -13,26 +13,43 @@ public class PacTests
 {
     private readonly Mock<IReader> _reader = new();
     private readonly Mock<IWriter> _writer = new();
+    private readonly GameState _gameState = new(
+        It.IsAny<Size>(),
+        It.IsAny<int>(),
+        It.IsAny<Pac>(),
+        Array.Empty<MovableEntity>(),
+        Array.Empty<Wall>(),
+        Array.Empty<Pellet>()
+    );
+    private readonly Pac _pac;
+    
+    public PacTests()
+    {
+        _pac = new Pac(
+            new Coordinate(),
+            Constants.PacStart,
+            It.IsAny<int>(),
+            Constants.PacStartingLives,
+            _reader.Object, _writer.Object);
+    }
+    
 
     [Theory]
     [MemberData(nameof(PrimitiveMoveTestData))]
     public void Move_ShouldMoveInRespectiveDirection_WhenKeyIsPressed(
-        Coordinate startingCoord, string keyPress, Coordinate expectedCoord)
+        Coordinate pacCoord, string keyPress, Coordinate expectedCoord)
     {
-        var pac = new Pac(startingCoord, _reader.Object, _writer.Object);
-        var gameState = new GameState(
-            new Size(3, 3),
-            pac,
-            Array.Empty<Wall>(),
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-        );
+        var gameState = _gameState with
+        {
+            Size = new Size(3, 3),
+            Pac = _pac with { Coordinate = pacCoord }
+        };
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(gameState);
-
+        var actualGameState = gameState.Pac.Move(gameState);
+        
         _reader.Verify(_ => _.ReadKey(), Times.Once);
-        Assert.Equal(expectedCoord, pac.Coordinate);
+        Assert.Equal(expectedCoord, actualGameState.Pac.Coordinate);
     }
 
     [Theory]
@@ -40,20 +57,17 @@ public class PacTests
     public void Move_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
         Coordinate pacCoord, Size mapSize, string keyPress, Coordinate expectedCoord)
     {
-        var pac = new Pac(pacCoord, _reader.Object, _writer.Object);
-        var gameState = new GameState(
-            mapSize,
-            pac,
-            Array.Empty<Wall>(),
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-        );
+        var gameState = _gameState with
+        {
+            Size = mapSize,
+            Pac = _pac with { Coordinate = pacCoord }
+        };
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(gameState);
-
+        var actualGameState = gameState.Pac.Move(gameState);
+        
         _reader.Verify(_ => _.ReadKey(), Times.Once);
-        Assert.Equal(expectedCoord, pac.Coordinate);
+        Assert.Equal(expectedCoord, actualGameState.Pac.Coordinate);
     }
 
     [Fact]
@@ -61,61 +75,36 @@ public class PacTests
     {
         const string invalidKeyPress = "";
         const string validKeyPress = Constants.UpKey;
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var gameState = new GameState(
-            new Size(3, 3),
-            pac,
-            Array.Empty<Wall>(),
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-        );
+        var gameState = _gameState with
+        {
+            Size = new Size(3, 3),
+            Pac = _pac with { Coordinate = new Coordinate(1, 1) }
+        };
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
 
-        pac.Move(gameState);
+        var actualGameState = gameState.Pac.Move(gameState);
 
         _writer.Verify(_ => _.Write(Messages.InvalidKeyPress), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
-        Assert.Equal(new Coordinate(1, 0), pac.Coordinate);
+        Assert.Equal(new Coordinate(1, 0), actualGameState.Pac.Coordinate);
     }
 
     [Fact]
     public void Move_ShouldContinuouslyQueryForKey_WhenMovingIntoAWall()
     {
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var gameState = new GameState(
-            new Size(3, 3),
-            pac,
-            new Wall[] {new(new Coordinate(1, 0))},
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-        );
+        var gameState = _gameState with
+        {
+            Size = new Size(3, 3),
+            Pac = _pac with { Coordinate = new Coordinate(1, 1) },
+            Walls = new Wall[] {new(new Coordinate(1, 0))}
+        };
         _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);
 
-        pac.Move(gameState);
+        var actualGameState = gameState.Pac.Move(gameState);
 
         _writer.Verify(_ => _.Write(Messages.WallObstruction), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
-        Assert.Equal(new Coordinate(1, 2), pac.Coordinate);
-    }
-
-    [Theory]
-    [MemberData(nameof(RemovePelletTestData))]
-    public void Move_ShouldRemovePelletAtNewCoordinate(
-        Size mapSize, Coordinate pacCoord, string keyPress, Coordinate pelletCoord)
-    {
-        var pac = new Pac(pacCoord, _reader.Object, _writer.Object);
-        var gameState = new GameState(
-            mapSize,
-            pac,
-            Array.Empty<Wall>(),
-            new List<Pellet> {new(pelletCoord)},
-            Array.Empty<MovableEntity>()
-        );
-        _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
-
-        pac.Move(gameState);
-
-        Assert.Empty(gameState.Pellets);
+        Assert.Equal(new Coordinate(1, 2), actualGameState.Pac.Coordinate);
     }
 
     [Theory]
@@ -125,19 +114,16 @@ public class PacTests
     [InlineData(Constants.RightKey, Constants.PacRight)]
     public void Move_ShouldUpdatePacSymbolBasedOnDirection_WhenKeyPressed(string keyPress, char expectedSymbol)
     {
-        var pac = new Pac(new Coordinate(1, 1), _reader.Object, _writer.Object);
-        var gameState = new GameState(
-            new Size(3, 4),
-            pac,
-            Array.Empty<Wall>(),
-            new List<Pellet>(),
-            Array.Empty<MovableEntity>()
-        );
+        var gameState = _gameState with
+        {
+            Size = new Size(3, 4),
+            Pac = _pac with { Coordinate = new Coordinate(1, 1) }
+        };
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        pac.Move(gameState);
+        var actualGameState = gameState.Pac.Move(gameState);
 
-        Assert.Equal(expectedSymbol, pac.Symbol);
+        Assert.Equal(expectedSymbol, actualGameState.Pac.Symbol);
     }
 
     private static IEnumerable<object[]> PrimitiveMoveTestData()
@@ -203,25 +189,6 @@ public class PacTests
             new Size(2, 2),
             Constants.RightKey,
             new Coordinate(0, 1)
-        };
-    }
-
-    private static IEnumerable<object[]> RemovePelletTestData()
-    {
-        yield return new object[]
-        {
-            new Size(2, 2),
-            new Coordinate(0, 0),
-            Constants.RightKey,
-            new Coordinate(1, 0)
-        };
-
-        yield return new object[]
-        {
-            new Size(2, 2),
-            new Coordinate(0, 0),
-            Constants.LeftKey,
-            new Coordinate(1, 0)
         };
     }
 }
