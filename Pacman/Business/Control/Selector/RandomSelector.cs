@@ -6,11 +6,9 @@ public class RandomSelector<T> : ISelector<T>
     {
         var collectionArr = collection.ToArray();
 
-        if (!collectionArr.Any())
+        if (!collectionArr.Any()) 
             throw new InvalidOperationException("Cannot invoke select on empty enumerable.");
-        
-        var random = new Random();
 
-        return collectionArr.ElementAt(random.Next(0, collectionArr.Length));
+        return collectionArr[new Random().Next(collectionArr.Length)];
     }
 }
