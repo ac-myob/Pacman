@@ -4,10 +4,7 @@ namespace Pacman.Business.View;
 
 public class ConsoleWriter : IWriter
 {
-    public void Write(string message)
-    {
-        Console.Write(message);
-    }
+    public void Write(string message) => Console.Write(message);
 
     public void Write(string message, IDictionary<char, Colour> colourMapping)
     {
@@ -20,7 +17,7 @@ public class ConsoleWriter : IWriter
                     Colour.Blue => ConsoleColor.Blue,
                     Colour.Yellow => ConsoleColor.Yellow,
                     Colour.Green => ConsoleColor.Green,
-                    _ => throw new ArgumentOutOfRangeException()
+                    _ => ConsoleColor.Black
                 };
 
             Console.Write(character);
@@ -28,8 +25,5 @@ public class ConsoleWriter : IWriter
         }
     }
 
-    public void Clear()
-    {
-        Console.Clear();
-    }
+    public void Clear() => Console.Clear();
 }
