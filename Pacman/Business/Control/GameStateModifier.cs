@@ -10,7 +10,8 @@ public static class GameStateModifier
         
         return gameState with
         {
-            Pellets = gameState.Pellets.Where(p => p.Coordinate != gameState.Pac.Coordinate)
+            Pellets = gameState.Pellets.Where(p => p.Coordinate != gameState.Pac.Coordinate),
+            MagicPellets = gameState.MagicPellets.Where(p => p.Coordinate != gameState.Pac.Coordinate)
         };
     }
     

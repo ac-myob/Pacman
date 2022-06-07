@@ -50,7 +50,7 @@ public class GameEngine
                 _gameState = _gameService.GetResetGameState(_gameState);
                 _displayMap();
             }
-            else if (!_gameState.Pellets.Any())
+            else if (!_gameState.GetPellets().Any())
             {
                 _writer.Write(Messages.RoundComplete);
                 _reader.ReadKey();

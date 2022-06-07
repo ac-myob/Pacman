@@ -1,4 +1,5 @@
 using System.Text;
+using Pacman.Business.Control;
 using Pacman.Business.Model;
 
 namespace Pacman.Variables;
@@ -15,7 +16,7 @@ public static class Messages
         var res = new StringBuilder();
         res.Append($"Lives: {new string(Constants.Heart, gameState.Lives)}\n");
         res.Append($"Round: {Math.Min(gameState.Round, Constants.MaxRounds)}/{Constants.MaxRounds}\n");
-        res.Append($"Pellets remaining: {gameState.Pellets.Count()}\n");
+        res.Append($"Pellets remaining: {gameState.GetPellets().Count()}\n");
 
         return res.ToString();
     }

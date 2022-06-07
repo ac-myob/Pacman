@@ -27,7 +27,7 @@ public static class GameStateQuery
     {
         var (width, length) = gameState.Size;
         var res = new StringBuilder(new string(Constants.Blank, length * width));
-        var entities = gameState.Pellets.Cast<Entity>().
+        var entities = gameState.GetPellets().
             Concat(gameState.Walls).
             Concat(gameState.GetMovableEntities()).
             OrderBy(o => o.Coordinate.Y).
@@ -42,6 +42,9 @@ public static class GameStateQuery
 
         return res.ToString();
     }
+    
+    public static IEnumerable<Entity> GetPellets(this GameState gameState) =>
+        gameState.Pellets.Cast<Entity>().Concat(gameState.MagicPellets);
 
     public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) => 
         gameState.Ghosts.Cast<MovableEntity>().Prepend(gameState.Pac);
