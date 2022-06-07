@@ -20,7 +20,8 @@ public class PathFindingGhostTests
         It.IsAny<Pac>(),
         Array.Empty<BaseGhost>(),
         Array.Empty<Wall>(),
-        Array.Empty<Pellet>()
+        Array.Empty<Pellet>(),
+        Array.Empty<MagicPellet>()
     );
     
     [Theory]

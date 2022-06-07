@@ -9,6 +9,7 @@ public static class Constants
     public const string ValidKeysRegex = $"^({UpKey}|{DownKey}|{LeftKey}|{RightKey})$";
     public const char Wall = '▩';
     public const char Pellet = '·';
+    public const char MagicPellet = '✪';
     public const char GreedyGhost = 'ᗣ';
     public const char RandomGhost = 'ᓆ';
     public const char PathFindingGhost = 'ᔬ';

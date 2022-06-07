@@ -21,7 +21,8 @@ public class GreedyGhostTests
         It.IsAny<Pac>(),
         It.IsAny<IEnumerable<BaseGhost>>(),
         Array.Empty<Wall>(),
-        Array.Empty<Pellet>()
+        Array.Empty<Pellet>(),
+        Array.Empty<MagicPellet>()
     );
     private readonly Pac _pac;
 

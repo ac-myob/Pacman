@@ -45,6 +45,7 @@ public class GameService
         var walls = new List<Wall>();
         var ghosts = new List<BaseGhost>();
         var pellets = new List<Pellet>();
+        var magicPellets = new List<MagicPellet>();
         
         for (var l = 0; l < length; l++)
             for (var w = 0; w < width; w++)
@@ -67,10 +68,13 @@ public class GameService
                     case Constants.Pellet:
                         pellets.Add(new Pellet(currentCoord));
                         break;
+                    case Constants.MagicPellet:
+                        magicPellets.Add(new MagicPellet(currentCoord));
+                        break;
                 }
             }
         
-        return _initialGameState = new GameState(size, Constants.PacStartingLives, Constants.StartRound, pac, ghosts, walls, pellets);
+        return _initialGameState = new GameState(size, Constants.PacStartingLives, Constants.StartRound, pac, ghosts, walls, pellets, magicPellets);
     }
 
     private static Coordinate _getPacCoord(IReadOnlyList<string> fileLines, Size size)

@@ -138,7 +138,7 @@ public class GameServiceTests
     {
         var gameState = _gameService.GetNewGameState(TestGame);
         var expectedGhostCoords = gameState.Ghosts.Select(g => g.Coordinate);
-        var ghosts = new MovableEntity[]
+        var ghosts = new BaseGhost[]
         {
             new RandomGhost(new Coordinate(0, 0), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>()),
             new GreedyGhost(new Coordinate(0, 3), It.IsAny<int>()),
@@ -191,11 +191,11 @@ public class GameServiceTests
     public void GetResetGameState_ReturnsGameStateWithPacmanLifeReducedByOne()
     {
         var gameState = _gameService.GetNewGameState(TestGame);
-        var originalPacLife = gameState.Pac.Lives;
+        var originalPacLife = gameState.Lives;
 
         var nextGameState = _gameService.GetResetGameState(gameState);
         
-        Assert.Equal(originalPacLife - 1, nextGameState.Pac.Lives);
+        Assert.Equal(originalPacLife - 1, nextGameState.Lives);
     }
     
     [Fact]

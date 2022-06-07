@@ -10,4 +10,5 @@ public record GameState(
     Pac Pac,
     IEnumerable<BaseGhost> Ghosts,
     IEnumerable<Wall> Walls,
-    IEnumerable<Pellet> Pellets); 
+    IEnumerable<Pellet> Pellets,
+    IEnumerable<MagicPellet> MagicPellets); 
