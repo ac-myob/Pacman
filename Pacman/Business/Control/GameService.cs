@@ -105,6 +105,7 @@ public class GameService
         _initialGameState = _initialGameState with
         {
             Round = gameState.Round + 1,
+            Pac = _initialGameState.Pac with{Lives = gameState.Pac.Lives},
             Ghosts = _getNewGhosts(),
         };
 
