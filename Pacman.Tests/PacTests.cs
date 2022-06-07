@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Moq;
 using Pacman.Business.Control;
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Variables;
@@ -17,7 +18,7 @@ public class PacTests
         It.IsAny<Size>(),
         It.IsAny<int>(),
         It.IsAny<Pac>(),
-        Array.Empty<MovableEntity>(),
+        Array.Empty<BaseGhost>(),
         Array.Empty<Wall>(),
         Array.Empty<Pellet>()
     );

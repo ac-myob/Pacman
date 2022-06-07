@@ -44,7 +44,7 @@ public class GameService
             _reader, 
             _writer);
         var walls = new List<Wall>();
-        var ghosts = new List<MovableEntity>();
+        var ghosts = new List<BaseGhost>();
         var pellets = new List<Pellet>();
         
         for (var l = 0; l < length; l++)
@@ -112,7 +112,7 @@ public class GameService
         return _initialGameState;
     }
 
-    private IEnumerable<MovableEntity> _getNewGhosts()
+    private IEnumerable<BaseGhost> _getNewGhosts()
     {
         var newGhostType = _ghostTypeSequence.GetNext();
         var posNewGhostCoords = _initialGameState!.Pellets.Select(p => p.Coordinate).

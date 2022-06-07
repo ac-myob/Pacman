@@ -18,7 +18,7 @@ public class GreedyGhostTests
         It.IsAny<Size>(),
         It.IsAny<int>(),
         It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<MovableEntity>>(),
+        It.IsAny<IEnumerable<BaseGhost>>(),
         Array.Empty<Wall>(),
         Array.Empty<Pellet>()
     );
@@ -44,7 +44,7 @@ public class GreedyGhostTests
         {
             Size = mapSize,
             Pac = _pac with {Coordinate = pacCoord},
-            Ghosts = new MovableEntity[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}
+            Ghosts = new BaseGhost[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}
         };
         
         var actualGameState = gameState.Ghosts.Single().Move(gameState);
@@ -61,7 +61,7 @@ public class GreedyGhostTests
         {
             Size = mapSize,
             Pac = _pac with {Coordinate = pacCoord},
-            Ghosts = new MovableEntity[] {new GreedyGhost(ghostCoord, It.IsAny<int>())},
+            Ghosts = new BaseGhost[] {new GreedyGhost(ghostCoord, It.IsAny<int>())},
             Walls = walls
         };
         
@@ -73,13 +73,13 @@ public class GreedyGhostTests
     [Theory]
     [MemberData(nameof(GhostsTestData))]
     public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenOtherGhosts(
-        Size mapSize, IList<MovableEntity> ghosts, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
+        Size mapSize, IList<BaseGhost> ghosts, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = _gameState with
         {
             Size = mapSize,
             Pac = _pac with {Coordinate = pacCoord},
-            Ghosts = new MovableEntity[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}.Concat(ghosts)
+            Ghosts = new BaseGhost[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}.Concat(ghosts)
         };
         
         var actualGameState = gameState.Ghosts.First().Move(gameState);
@@ -140,7 +140,7 @@ public class GreedyGhostTests
         yield return new object[]
         {
             new Size(4, 4),
-            new MovableEntity[] {new RandomGhost(new Coordinate(2, 1), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
+            new BaseGhost[] {new RandomGhost(new Coordinate(2, 1), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
             new Coordinate(1, 1), 
             new Coordinate(3, 1), 
             new Coordinate(1, 1)
@@ -149,7 +149,7 @@ public class GreedyGhostTests
         yield return new object[]
         {
             new Size(4, 4),
-            new MovableEntity[] {new RandomGhost(new Coordinate(1, 2), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
+            new BaseGhost[] {new RandomGhost(new Coordinate(1, 2), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
             new Coordinate(1, 1), 
             new Coordinate(3, 3), 
             new Coordinate(2, 1)

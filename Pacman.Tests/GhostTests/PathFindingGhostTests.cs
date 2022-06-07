@@ -17,7 +17,7 @@ public class PathFindingGhostTests
         It.IsAny<Size>(),
         It.IsAny<int>(),
         It.IsAny<Pac>(),
-        Array.Empty<MovableEntity>(),
+        Array.Empty<BaseGhost>(),
         Array.Empty<Wall>(),
         Array.Empty<Pellet>()
     );
@@ -32,7 +32,7 @@ public class PathFindingGhostTests
             Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), Constants.PacStartingLives,
                 It.IsAny<IReader>(), It.IsAny<IWriter>()),
             Size = mapSize,
-            Ghosts = new MovableEntity[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())}
+            Ghosts = new BaseGhost[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())}
         };
 
         var actualGameState = gameState.Ghosts.Single().Move(gameState);
@@ -50,7 +50,7 @@ public class PathFindingGhostTests
             Size = mapSize,
             Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), Constants.PacStartingLives,
                 It.IsAny<IReader>(), It.IsAny<IWriter>()),
-            Ghosts = new MovableEntity[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())},
+            Ghosts = new BaseGhost[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())},
             Walls = walls
         };
 

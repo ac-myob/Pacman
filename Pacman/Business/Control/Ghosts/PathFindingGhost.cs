@@ -3,8 +3,7 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public record PathFindingGhost(Coordinate Coordinate, int Id) : 
-    MovableEntity(Coordinate, Constants.PathFindingGhost, Id)
+public record PathFindingGhost(Coordinate Coordinate, int Id) : BaseGhost(Coordinate, Constants.PathFindingGhost, Id)
 {
     public override GameState Move(GameState gameState)
     {

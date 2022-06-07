@@ -18,7 +18,7 @@ public class GameStateModifierTests
         It.IsAny<Size>(),
         It.IsAny<int>(),
         It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<MovableEntity>>(),
+        It.IsAny<IEnumerable<BaseGhost>>(),
         Array.Empty<Wall>(),
         Array.Empty<Pellet>()
     );
@@ -39,7 +39,7 @@ public class GameStateModifierTests
         var gameState = _gameState with
         {
             Pac = _pac with { Coordinate = pacCoord },
-            Ghosts = new MovableEntity[] { new GreedyGhost(ghostCoord, It.IsAny<int>()) },
+            Ghosts = new BaseGhost[] { new GreedyGhost(ghostCoord, It.IsAny<int>()) },
             Pellets = new Pellet[] {new(pacCoord), new(ghostCoord)}
         };
 
@@ -55,7 +55,7 @@ public class GameStateModifierTests
         var gameState = _gameState with
         {
             Pac = _pac with { Coordinate = coord },
-            Ghosts = new MovableEntity[] { new GreedyGhost(coord, It.IsAny<int>()) },
+            Ghosts = new BaseGhost[] { new GreedyGhost(coord, It.IsAny<int>()) },
             Pellets = new Pellet[] {new(coord)}
         };
 
@@ -68,7 +68,7 @@ public class GameStateModifierTests
     public void UpdateGhostCoordinate_ReturnsGameStateWithUpdatedGhostCoordinate_GivenIdAndNewCoordinate()
     {
         var newCoord = new Coordinate(4, 4);
-        var ghosts = new MovableEntity[]
+        var ghosts = new BaseGhost[]
         {
             new RandomGhost(new Coordinate(0, 0), 0, It.IsAny<ISelector<Coordinate>>()),
             new GreedyGhost(new Coordinate(0, 3), 1),

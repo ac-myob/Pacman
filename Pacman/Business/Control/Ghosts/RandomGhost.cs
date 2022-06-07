@@ -4,8 +4,8 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public record RandomGhost(Coordinate Coordinate, int Id, ISelector<Coordinate> Selector) :
-    MovableEntity(Coordinate, Constants.RandomGhost, Id)
+public record RandomGhost(Coordinate Coordinate, int Id, ISelector<Coordinate> Selector) : 
+    BaseGhost(Coordinate, Constants.RandomGhost, Id)
 {
     private ISelector<Coordinate> Selector { get; } = Selector;
     

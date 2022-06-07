@@ -6,7 +6,7 @@ namespace Pacman.Business.Control.Ghosts;
 
 public static class GhostFactory
 { 
-    public static MovableEntity GetGhost(GhostType ghostType, Coordinate coordinate, int id)
+    public static BaseGhost GetGhost(GhostType ghostType, Coordinate coordinate, int id)
     {
         return ghostType switch
         {

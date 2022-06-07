@@ -44,7 +44,7 @@ public static class GameStateQuery
     }
 
     public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) => 
-        gameState.Ghosts.Prepend(gameState.Pac);
+        gameState.Ghosts.Cast<MovableEntity>().Prepend(gameState.Pac);
 
     public static bool IsPacOnGhost(this GameState gameState) => 
         gameState.Ghosts.Any(g => g.Coordinate == gameState.Pac.Coordinate);

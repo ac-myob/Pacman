@@ -17,7 +17,7 @@ public class GameStateQueryTests
         It.IsAny<Size>(),
         It.IsAny<int>(),
         It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<MovableEntity>>(),
+        It.IsAny<IEnumerable<BaseGhost>>(),
         Array.Empty<Wall>(),
         Array.Empty<Pellet>()
     );
@@ -33,7 +33,7 @@ public class GameStateQueryTests
     [Fact]
     public void GetString_ReturnsStringRepresentationOfGame_WhenEntitiesDoNotShareSameCoordinate()
     {
-        var ghosts = new MovableEntity[] 
+        var ghosts = new BaseGhost[] 
         {
             new RandomGhost(new Coordinate(0, 2), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>()),
             new GreedyGhost(new Coordinate(2, 0), It.IsAny<int>()),
@@ -57,7 +57,7 @@ public class GameStateQueryTests
     [Fact]
     public void GetString_ReturnsStringRepresentationOfGame_WhenEntitiesShareSameCoordinate()
     {
-        var ghosts = new MovableEntity[] 
+        var ghosts = new BaseGhost[] 
         {
             new RandomGhost(new Coordinate(0, 2), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>()),
             new GreedyGhost(new Coordinate(2, 0), It.IsAny<int>()),
@@ -91,7 +91,7 @@ public class GameStateQueryTests
         var gameState = _gameState with
         {
             Pac = _pac with {Coordinate = pacCoord},
-            Ghosts = new MovableEntity[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}
+            Ghosts = new BaseGhost[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}
         };
 
         var actualBool = gameState.IsPacOnGhost();

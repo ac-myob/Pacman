@@ -18,7 +18,7 @@ public class RandomGhostTests
         It.IsAny<Size>(),
         It.IsAny<int>(),
         It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<MovableEntity>>(),
+        It.IsAny<IEnumerable<BaseGhost>>(),
         Array.Empty<Wall>(),
         Array.Empty<Pellet>()
     );
@@ -29,7 +29,7 @@ public class RandomGhostTests
         var gameState = _gameState with
         {
             Size = new Size(3, 3),
-            Ghosts = new MovableEntity[] {new RandomGhost(new Coordinate(1, 1), It.IsAny<int>(), _mockSelector.Object)}
+            Ghosts = new BaseGhost[] {new RandomGhost(new Coordinate(1, 1), It.IsAny<int>(), _mockSelector.Object)}
         };
         var expectedPosCoords = new[]
         {
@@ -55,7 +55,7 @@ public class RandomGhostTests
         var gameState = _gameState with
         {
             Size = size,
-            Ghosts = new MovableEntity[] {new RandomGhost(ghostStartCoord, It.IsAny<int>(), _mockSelector.Object)},
+            Ghosts = new BaseGhost[] {new RandomGhost(ghostStartCoord, It.IsAny<int>(), _mockSelector.Object)},
             Walls = walls
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
@@ -70,12 +70,12 @@ public class RandomGhostTests
     [Theory]
     [MemberData(nameof(GhostsTestData))]
     public void Move_MovesGhostToRandomValidPosition_GivenGhosts(
-        Size size, Coordinate ghostStartCoord, IEnumerable<MovableEntity> ghosts, IEnumerable<Coordinate> expectedPosCoords)
+        Size size, Coordinate ghostStartCoord, IEnumerable<BaseGhost> ghosts, IEnumerable<Coordinate> expectedPosCoords)
     {
         var gameState = _gameState with
         {
             Size = size,
-            Ghosts = new MovableEntity[] {new RandomGhost(ghostStartCoord, It.IsAny<int>(), _mockSelector.Object)}.Concat(ghosts),
+            Ghosts = new BaseGhost[] {new RandomGhost(ghostStartCoord, It.IsAny<int>(), _mockSelector.Object)}.Concat(ghosts),
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
@@ -127,7 +127,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new MovableEntity[] {new RandomGhost(new Coordinate(1, 0), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
+            new BaseGhost[] {new RandomGhost(new Coordinate(1, 0), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
             new Coordinate[] {new(1, 2), new(2, 1), new(0, 1)}
         };
     }

@@ -3,7 +3,7 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public record GreedyGhost(Coordinate Coordinate, int Id) : MovableEntity(Coordinate, Constants.GreedyGhost, Id)
+public record GreedyGhost(Coordinate Coordinate, int Id) : BaseGhost(Coordinate, Constants.GreedyGhost, Id)
 {
     public override GameState Move(GameState gameState)
     {
