@@ -6,6 +6,7 @@ using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
+using Pacman.Variables;
 using Xunit;
 using Capture = Moq.Capture;
 
@@ -16,6 +17,7 @@ public class RandomGhostTests
     private readonly Mock<ISelector<Coordinate>> _mockSelector = new();
     private readonly GameState _gameState = new(
         It.IsAny<Size>(),
+        Constants.PacStartingLives,
         It.IsAny<int>(),
         It.IsAny<Pac>(),
         It.IsAny<IEnumerable<BaseGhost>>(),

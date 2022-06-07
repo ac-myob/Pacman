@@ -4,7 +4,7 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public record Pac(Coordinate Coordinate, char Symbol, int Id, int Lives, IReader Reader, IWriter Writer) : 
+public record Pac(Coordinate Coordinate, char Symbol, int Id, IReader Reader, IWriter Writer) : 
     MovableEntity(Coordinate, Symbol, Id)
 {
     private IWriter Writer { get; } = Writer;

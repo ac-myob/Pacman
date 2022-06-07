@@ -15,6 +15,7 @@ public class PathFindingGhostTests
 {
     private readonly GameState _gameState = new(
         It.IsAny<Size>(),
+        Constants.PacStartingLives,
         It.IsAny<int>(),
         It.IsAny<Pac>(),
         Array.Empty<BaseGhost>(),
@@ -29,7 +30,7 @@ public class PathFindingGhostTests
     {
         var gameState = _gameState with
         {
-            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), Constants.PacStartingLives,
+            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(),
                 It.IsAny<IReader>(), It.IsAny<IWriter>()),
             Size = mapSize,
             Ghosts = new BaseGhost[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())}
@@ -48,8 +49,8 @@ public class PathFindingGhostTests
         var gameState = _gameState with
         {            
             Size = mapSize,
-            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), Constants.PacStartingLives,
-                It.IsAny<IReader>(), It.IsAny<IWriter>()),
+            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), It.IsAny<IReader>(), 
+                It.IsAny<IWriter>()),
             Ghosts = new BaseGhost[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())},
             Walls = walls
         };

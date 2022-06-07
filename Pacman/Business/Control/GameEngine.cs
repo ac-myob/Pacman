@@ -58,7 +58,7 @@ public class GameEngine
                 _displayMap();
             }
 
-        } while (!_gameState.IsGameFinished() && _gameState.Pac.Lives > 0);
+        } while (!_gameState.IsGameFinished() && _gameState.Lives > 0);
         
         _writer.Write(Messages.GetGameOutcome(_gameState));
     }

@@ -16,6 +16,7 @@ public class PacTests
     private readonly Mock<IWriter> _writer = new();
     private readonly GameState _gameState = new(
         It.IsAny<Size>(),
+        Constants.PacStartingLives,
         It.IsAny<int>(),
         It.IsAny<Pac>(),
         Array.Empty<BaseGhost>(),
@@ -30,7 +31,6 @@ public class PacTests
             new Coordinate(),
             Constants.PacStart,
             It.IsAny<int>(),
-            Constants.PacStartingLives,
             _reader.Object, _writer.Object);
     }
     

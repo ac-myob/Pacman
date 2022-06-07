@@ -15,6 +15,7 @@ public class GameStateQueryTests
 {
     private readonly GameState _gameState = new(
         It.IsAny<Size>(),
+        Constants.PacStartingLives,
         It.IsAny<int>(),
         It.IsAny<Pac>(),
         It.IsAny<IEnumerable<BaseGhost>>(),
@@ -24,7 +25,6 @@ public class GameStateQueryTests
     private readonly Pac _pac = new(
         It.IsAny<Coordinate>(), 
         Constants.PacStart, 
-        It.IsAny<int>(), 
         It.IsAny<int>(),
         It.IsAny<IReader>(), 
         It.IsAny<IWriter>()

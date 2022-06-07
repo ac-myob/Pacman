@@ -39,8 +39,7 @@ public class GameService
         var pac = new Pac(
             _getPacCoord(fileLines, size), 
             Constants.PacStart,
-            _numberSequence.GetNext(), 
-            Constants.PacStartingLives, 
+            _numberSequence.GetNext(),
             _reader, 
             _writer);
         var walls = new List<Wall>();
@@ -71,7 +70,7 @@ public class GameService
                 }
             }
         
-        return _initialGameState = new GameState(size, Constants.StartRound, pac, ghosts, walls, pellets);
+        return _initialGameState = new GameState(size, Constants.PacStartingLives, Constants.StartRound, pac, ghosts, walls, pellets);
     }
 
     private static Coordinate _getPacCoord(IReadOnlyList<string> fileLines, Size size)
@@ -105,7 +104,6 @@ public class GameService
         _initialGameState = _initialGameState with
         {
             Round = gameState.Round + 1,
-            Pac = _initialGameState.Pac with{Lives = gameState.Pac.Lives},
             Ghosts = _getNewGhosts(),
         };
 
@@ -134,7 +132,7 @@ public class GameService
         
         return _initialGameState with
         {
-            Pac = _initialGameState.Pac with { Lives = gameState.Pac.Lives - 1 },
+            Lives = gameState.Lives - 1,
             Pellets = gameState.Pellets
         };
     }

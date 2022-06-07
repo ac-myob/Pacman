@@ -16,6 +16,7 @@ public class GreedyGhostTests
 {
     private readonly GameState _gameState = new(
         It.IsAny<Size>(),
+        Constants.PacStartingLives,
         It.IsAny<int>(),
         It.IsAny<Pac>(),
         It.IsAny<IEnumerable<BaseGhost>>(),
@@ -30,7 +31,6 @@ public class GreedyGhostTests
             new Coordinate(),
             Constants.PacStart,
             It.IsAny<int>(),
-            Constants.PacStartingLives,
             It.IsAny<IReader>(),
             It.IsAny<IWriter>());
     }

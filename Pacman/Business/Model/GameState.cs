@@ -5,6 +5,7 @@ namespace Pacman.Business.Model;
 
 public record GameState(
     Size Size, 
+    int Lives,
     int Round,
     Pac Pac,
     IEnumerable<BaseGhost> Ghosts,
