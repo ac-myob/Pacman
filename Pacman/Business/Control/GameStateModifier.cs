@@ -1,4 +1,6 @@
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
+using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
@@ -11,15 +13,16 @@ public static class GameStateModifier
         return gameState with
         {
             Pellets = gameState.Pellets.Where(p => p.Coordinate != gameState.Pac.Coordinate),
-            MagicPellets = gameState.MagicPellets.Where(p => p.Coordinate != gameState.Pac.Coordinate)
         };
     }
-    
-    public static GameState UpdateGhostCoordinate(this GameState gameState, int id, Coordinate newCoord)
+
+    public static GameState UpdatePowerUp(this GameState gameState)
     {
-        return gameState with
-        {
-            Ghosts = gameState.Ghosts.Select(g => g.Id != id ? g : g with{Coordinate = newCoord})
-        };
+        var onMagicPellet = gameState.Pellets.Any(p =>
+            p.Coordinate == gameState.Pac.Coordinate && p.Symbol == Constants.MagicPellet);
+        
+        if (onMagicPellet) return gameState with {PowerUpRemaining = Constants.PowerUpTurns};
+
+        return gameState with {PowerUpRemaining = Math.Max(gameState.PowerUpRemaining - 1, 0)};
     }
 }

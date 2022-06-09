@@ -38,9 +38,9 @@ public class GameEngine
         do
         {
             foreach (var movableEntity in _gameState.GetMovableEntities())
-                _gameState = movableEntity.Move(_gameState);
+                _gameState = movableEntity.PlayTurn(_gameState);
 
-            _gameState = _gameState.UpdatePellets();
+            _gameState = _gameState.UpdatePowerUp().UpdatePellets();
             _displayMap();
 
             if (_gameState.IsPacOnGhost())
@@ -50,7 +50,7 @@ public class GameEngine
                 _gameState = _gameService.GetResetGameState(_gameState);
                 _displayMap();
             }
-            else if (!_gameState.GetPellets().Any())
+            else if (!_gameState.Pellets.Any())
             {
                 _writer.Write(Messages.RoundComplete);
                 _reader.ReadKey();

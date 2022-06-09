@@ -13,10 +13,10 @@ public static class GameStateQuery
         var (length, width) = gameState.Size;
         var newCoord = direction switch
         {
-            Direction.North => new Coordinate(x, Utilities.Mod(y - 1, width)),
-            Direction.South => new Coordinate(x, Utilities.Mod(y + 1, width)),
-            Direction.East => new Coordinate(Utilities.Mod(x + 1, length), y),
-            Direction.West => new Coordinate(Utilities.Mod(x - 1, length), y),
+            Direction.North => coordinate with{Y = Utilities.Mod(y - 1, width)},
+            Direction.South => coordinate with{Y = Utilities.Mod(y + 1, width)},
+            Direction.East => coordinate with{X = Utilities.Mod(x + 1, length)},
+            Direction.West => coordinate with{X = Utilities.Mod(x - 1, length)},
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
 
@@ -27,7 +27,7 @@ public static class GameStateQuery
     {
         var (width, length) = gameState.Size;
         var res = new StringBuilder(new string(Constants.Blank, length * width));
-        var entities = gameState.GetPellets().
+        var entities = gameState.Pellets.Cast<Entity>().
             Concat(gameState.Walls).
             Concat(gameState.GetMovableEntities()).
             OrderBy(o => o.Coordinate.Y).
@@ -43,9 +43,6 @@ public static class GameStateQuery
         return res.ToString();
     }
     
-    public static IEnumerable<Entity> GetPellets(this GameState gameState) =>
-        gameState.Pellets.Cast<Entity>().Concat(gameState.MagicPellets);
-
     public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) => 
         gameState.Ghosts.Cast<MovableEntity>().Prepend(gameState.Pac);
 

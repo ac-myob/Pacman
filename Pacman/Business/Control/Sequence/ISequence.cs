@@ -1,5 +1,3 @@
-using Pacman.Variables;
-
 namespace Pacman.Business.Control.Sequence;
 
 public interface ISequence<out T>

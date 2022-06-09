@@ -25,4 +25,5 @@ public static class Constants
     public const int StartRound = 1;
     public const int MaxRounds = 4;
     public const int StartingId = 0;
+    public const int PowerUpTurns = 10;
 }
