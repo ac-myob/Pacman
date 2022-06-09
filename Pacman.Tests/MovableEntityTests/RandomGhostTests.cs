@@ -2,37 +2,41 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
-using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
-using Pacman.Variables;
 using Xunit;
 using Capture = Moq.Capture;
 
-namespace Pacman.Tests.GhostTests;
+namespace Pacman.Tests.MovableEntityTests;
 
 public class RandomGhostTests
 {
     private readonly Mock<ISelector<Coordinate>> _mockSelector = new();
-    private readonly GameState _gameState = new(
-        It.IsAny<Size>(),
-        Constants.PacStartingLives,
-        It.IsAny<int>(),
-        It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<BaseGhost>>(),
-        Array.Empty<Wall>(),
-        Array.Empty<Pellet>(),
-        Array.Empty<MagicPellet>()
-    );
+    private readonly IMoveStrategy _moveStrategy;
 
-    [Fact]
-    public void Move_MovesGhostToRandomValidPosition_GivenNoObstacles()
+    public RandomGhostTests()
     {
-        var gameState = _gameState with
+        _moveStrategy = new RandomMoveStrategy(_mockSelector.Object);
+    }
+    
+    [Fact]
+    public void PlayTurn_MovesGhostToRandomValidPosition_GivenNoObstacles()
+    {
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Ghosts = new BaseGhost[] {new RandomGhost(new Coordinate(1, 1), It.IsAny<int>(), _mockSelector.Object)}
+            Pac = TestHelper.GetPac() with{Id = 0},
+            Ghosts = new[]
+            {
+                TestHelper.GetGhost() with
+                {
+                    Coordinate = new Coordinate(1, 1), 
+                    MoveStrategy = _moveStrategy,
+                    Id = 1
+                }
+            }
         };
         var expectedPosCoords = new[]
         {
@@ -45,46 +49,64 @@ public class RandomGhostTests
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
 
         _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
-        gameState.Ghosts.Single().Move(gameState);
+        gameState.Ghosts.Single().PlayTurn(gameState);
 
         Assert.Equal(expectedPosCoords, actualPosCoords);
     }
     
     [Theory]
     [MemberData(nameof(WallsTestData))]
-    public void Move_MovesGhostToRandomValidPosition_GivenWalls(
+    public void PlayTurn_MovesGhostToRandomValidPosition_GivenWalls(
         Size size, Coordinate ghostStartCoord, IEnumerable<Wall> walls, IEnumerable<Coordinate> expectedPosCoords)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Ghosts = new BaseGhost[] {new RandomGhost(ghostStartCoord, It.IsAny<int>(), _mockSelector.Object)},
+            Pac = TestHelper.GetPac() with{Id = 0},
+            Ghosts = new[]
+            {
+                TestHelper.GetGhost() with
+                {
+                    Coordinate = ghostStartCoord, 
+                    MoveStrategy = _moveStrategy,
+                    Id = 1
+                }
+            },
             Walls = walls
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
         
         _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
-        gameState.Ghosts.Single().Move(gameState);
+        gameState.Ghosts.Single().PlayTurn(gameState);
         
         Assert.Equal(expectedPosCoords, actualPosCoords);
     }
     
     [Theory]
     [MemberData(nameof(GhostsTestData))]
-    public void Move_MovesGhostToRandomValidPosition_GivenGhosts(
-        Size size, Coordinate ghostStartCoord, IEnumerable<BaseGhost> ghosts, IEnumerable<Coordinate> expectedPosCoords)
+    public void PlayTurn_MovesGhostToRandomValidPosition_GivenGhosts(
+        Size size, Coordinate ghostStartCoord, IEnumerable<Ghost> ghosts, IEnumerable<Coordinate> expectedPosCoords)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Ghosts = new BaseGhost[] {new RandomGhost(ghostStartCoord, It.IsAny<int>(), _mockSelector.Object)}.Concat(ghosts),
+            Pac = TestHelper.GetPac() with{Id = 0},
+            Ghosts = new[]
+            {
+                TestHelper.GetGhost() with
+                {
+                    Coordinate = ghostStartCoord, 
+                    MoveStrategy = _moveStrategy,
+                    Id = 1
+                }
+            }.Concat(ghosts)
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
         
         _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
-        gameState.Ghosts.First().Move(gameState);
+        gameState.Ghosts.First().PlayTurn(gameState);
         
         Assert.Equal(expectedPosCoords, actualPosCoords);
     }
@@ -130,7 +152,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new BaseGhost[] {new RandomGhost(new Coordinate(1, 0), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>())},
+            new[] {TestHelper.GetGhost() with{Coordinate = new Coordinate(1, 0)}},
             new Coordinate[] {new(1, 2), new(2, 1), new(0, 1)}
         };
     }

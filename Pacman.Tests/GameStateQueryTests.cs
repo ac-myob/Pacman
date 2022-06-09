@@ -1,11 +1,6 @@
-using System;
 using System.Collections.Generic;
-using Moq;
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
-using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
-using Pacman.Business.View;
 using Pacman.Variables;
 using Xunit;
 
@@ -13,37 +8,19 @@ namespace Pacman.Tests;
 
 public class GameStateQueryTests
 {
-    private readonly GameState _gameState = new(
-        It.IsAny<Size>(),
-        Constants.PacStartingLives,
-        It.IsAny<int>(),
-        It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<BaseGhost>>(),
-        Array.Empty<Wall>(),
-        Array.Empty<Pellet>(),
-        Array.Empty<MagicPellet>()
-    );
-    private readonly Pac _pac = new(
-        It.IsAny<Coordinate>(), 
-        Constants.PacStart, 
-        It.IsAny<int>(),
-        It.IsAny<IReader>(), 
-        It.IsAny<IWriter>()
-    );
-    
     [Fact]
     public void GetString_ReturnsStringRepresentationOfGame_WhenEntitiesDoNotShareSameCoordinate()
     {
-        var ghosts = new BaseGhost[] 
+        var ghosts = new[]
         {
-            new RandomGhost(new Coordinate(0, 2), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>()),
-            new GreedyGhost(new Coordinate(2, 0), It.IsAny<int>()),
-            new PathFindingGhost(new Coordinate(2, 2), It.IsAny<int>())
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(0, 2), Symbol = Constants.RandomGhost},
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(2, 0), Symbol = Constants.GreedyGhost},
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(2, 2), Symbol = Constants.PathFindingGhost},
         };
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = _pac with {Coordinate = new Coordinate(0, 0)},
+            Pac = TestHelper.GetPac() with {Coordinate = new Coordinate(0, 0)},
             Ghosts = ghosts,
             Walls = new Wall[] {new(new Coordinate(1, 1))}
         };
@@ -58,20 +35,20 @@ public class GameStateQueryTests
     [Fact]
     public void GetString_ReturnsStringRepresentationOfGame_WhenEntitiesShareSameCoordinate()
     {
-        var ghosts = new BaseGhost[] 
+        var ghosts = new[]
         {
-            new RandomGhost(new Coordinate(0, 2), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>()),
-            new GreedyGhost(new Coordinate(2, 0), It.IsAny<int>()),
-            new PathFindingGhost(new Coordinate(2, 2), It.IsAny<int>())
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(0, 2), Symbol = Constants.RandomGhost},
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(2, 0), Symbol = Constants.GreedyGhost},
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(2, 2), Symbol = Constants.PathFindingGhost},
         };
         var pellets = new List<Pellet>();
         for (var i = 0; i < 3; i++)
             for (var j = 0; j < 3; j++)
-                pellets.Add(new Pellet(new Coordinate(i, j)));
-        var gameState = _gameState with
+                pellets.Add(new Pellet(new Coordinate(i, j), Constants.Pellet));
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = _pac with {Coordinate = new Coordinate(0, 0)},
+            Pac = TestHelper.GetPac() with {Coordinate = new Coordinate(0, 0)},
             Ghosts = ghosts,
             Walls = new Wall[] {new(new Coordinate(1, 1))},
             Pellets = pellets
@@ -89,10 +66,10 @@ public class GameStateQueryTests
     public void IsPacOnGhost_ReturnsTrueIfPacHasSameCoordinateAsAGhost(
         Coordinate pacCoord, Coordinate ghostCoord, bool expectedBool)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
-            Pac = _pac with {Coordinate = pacCoord},
-            Ghosts = new BaseGhost[] {new GreedyGhost(ghostCoord, It.IsAny<int>())}
+            Pac = TestHelper.GetPac() with {Coordinate = pacCoord},
+            Ghosts = new[] {TestHelper.GetGhost() with{Coordinate = ghostCoord}}
         };
 
         var actualBool = gameState.IsPacOnGhost();

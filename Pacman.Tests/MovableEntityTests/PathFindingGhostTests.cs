@@ -1,62 +1,62 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using Moq;
-using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
-using Pacman.Business.View;
-using Pacman.Variables;
 using Xunit;
 
-namespace Pacman.Tests.GhostTests;
+namespace Pacman.Tests.MovableEntityTests;
 
 public class PathFindingGhostTests
 {
-    private readonly GameState _gameState = new(
-        It.IsAny<Size>(),
-        Constants.PacStartingLives,
-        It.IsAny<int>(),
-        It.IsAny<Pac>(),
-        Array.Empty<BaseGhost>(),
-        Array.Empty<Wall>(),
-        Array.Empty<Pellet>(),
-        Array.Empty<MagicPellet>()
-    );
+    private readonly IMoveStrategy _moveStrategy = new PathFindingMoveStrategy();
     
     [Theory]
     [MemberData(nameof(NoObstaclesTestData))]
-    public void Move_MovesGhostTowardPac_GivenNoObstacles(
+    public void PlayTurn_MovesGhostTowardPac_GivenNoObstacles(
         Size mapSize, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
-            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(),
-                It.IsAny<IReader>(), It.IsAny<IWriter>()),
+            Pac = TestHelper.GetPac() with{Coordinate = pacCoord, Id = 0},
             Size = mapSize,
-            Ghosts = new BaseGhost[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())}
+            Ghosts = new[]
+            {
+                TestHelper.GetGhost() with
+                {
+                    Coordinate = ghostCoord, 
+                    MoveStrategy = _moveStrategy, 
+                    Id = 1
+                }
+            }
         };
 
-        var actualGameState = gameState.Ghosts.Single().Move(gameState);
+        var actualGameState = gameState.Ghosts.Single().PlayTurn(gameState);
         
         Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
     [MemberData(nameof(WallsTestData))]
-    public void Move_MovesGhostTowardPac_GivenWalls(
+    public void PlayTurn_MovesGhostTowardPac_GivenWalls(
         Size mapSize, IEnumerable<Wall> walls, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {            
             Size = mapSize,
-            Pac = new Pac(pacCoord, Constants.PacStart, It.IsAny<int>(), It.IsAny<IReader>(), 
-                It.IsAny<IWriter>()),
-            Ghosts = new BaseGhost[] {new PathFindingGhost(ghostCoord, It.IsAny<int>())},
+            Pac = TestHelper.GetPac() with{Coordinate = pacCoord, Id = 0},
+            Ghosts = new[]
+            {
+                TestHelper.GetGhost() with
+                {
+                    Coordinate = ghostCoord, 
+                    MoveStrategy = _moveStrategy, 
+                    Id = 1
+                }
+            },
             Walls = walls
         };
 
-        var actualGameState = gameState.Ghosts.Single().Move(gameState);
+        var actualGameState = gameState.Ghosts.Single().PlayTurn(gameState);
         
         Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
     }

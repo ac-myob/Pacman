@@ -1,90 +1,74 @@
-using System;
 using System.Collections.Generic;
 using Moq;
-using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Variables;
 using Xunit;
 
-namespace Pacman.Tests;
+namespace Pacman.Tests.MovableEntityTests;
 
 public class PacTests
 {
     private readonly Mock<IReader> _reader = new();
     private readonly Mock<IWriter> _writer = new();
-    private readonly GameState _gameState = new(
-        It.IsAny<Size>(),
-        Constants.PacStartingLives,
-        It.IsAny<int>(),
-        It.IsAny<Pac>(),
-        Array.Empty<BaseGhost>(),
-        Array.Empty<Wall>(),
-        Array.Empty<Pellet>(),
-        Array.Empty<MagicPellet>()
-    );
-    private readonly Pac _pac;
-    
+    private readonly IMoveStrategy _moveStrategy;
+
     public PacTests()
     {
-        _pac = new Pac(
-            new Coordinate(),
-            Constants.PacStart,
-            It.IsAny<int>(),
-            _reader.Object, _writer.Object);
+        _moveStrategy = new PacMoveStrategy(_reader.Object, _writer.Object);
     }
-    
+
 
     [Theory]
     [MemberData(nameof(PrimitiveMoveTestData))]
-    public void Move_ShouldMoveInRespectiveDirection_WhenKeyIsPressed(
+    public void PlayTurn_ShouldMoveInRespectiveDirection_WhenKeyIsPressed(
         Coordinate pacCoord, string keyPress, Coordinate expectedCoord)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = _pac with { Coordinate = pacCoord }
+            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, MoveStrategy = _moveStrategy}
         };
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        var actualGameState = gameState.Pac.Move(gameState);
-        
+        var actualGameState = gameState.Pac.PlayTurn(gameState);
+
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, actualGameState.Pac.Coordinate);
     }
 
     [Theory]
     [MemberData(nameof(WrappingTestData))]
-    public void Move_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
+    public void PlayTurn_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
         Coordinate pacCoord, Size mapSize, string keyPress, Coordinate expectedCoord)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = _pac with { Coordinate = pacCoord }
+            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, MoveStrategy = _moveStrategy}
         };
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        var actualGameState = gameState.Pac.Move(gameState);
-        
+        var actualGameState = gameState.Pac.PlayTurn(gameState);
+
         _reader.Verify(_ => _.ReadKey(), Times.Once);
         Assert.Equal(expectedCoord, actualGameState.Pac.Coordinate);
     }
 
     [Fact]
-    public void Move_ShouldContinuouslyQueryForKey_WhenKeyPressIsInvalid()
+    public void PlayTurn_ShouldContinuouslyQueryForKey_WhenKeyPressIsInvalid()
     {
         const string invalidKeyPress = "";
         const string validKeyPress = Constants.UpKey;
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = _pac with { Coordinate = new Coordinate(1, 1) }
+            Pac = TestHelper.GetPac() with {Coordinate = new Coordinate(1, 1), MoveStrategy = _moveStrategy}
         };
         _reader.SetupSequence(_ => _.ReadKey()).Returns(invalidKeyPress).Returns(validKeyPress);
 
-        var actualGameState = gameState.Pac.Move(gameState);
+        var actualGameState = gameState.Pac.PlayTurn(gameState);
 
         _writer.Verify(_ => _.Write(Messages.InvalidKeyPress), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
@@ -92,17 +76,17 @@ public class PacTests
     }
 
     [Fact]
-    public void Move_ShouldContinuouslyQueryForKey_WhenMovingIntoAWall()
+    public void PlayTurn_ShouldContinuouslyQueryForKey_WhenMovingIntoAWall()
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = _pac with { Coordinate = new Coordinate(1, 1) },
+            Pac = TestHelper.GetPac() with {Coordinate = new Coordinate(1, 1), MoveStrategy = _moveStrategy},
             Walls = new Wall[] {new(new Coordinate(1, 0))}
         };
         _reader.SetupSequence(_ => _.ReadKey()).Returns(Constants.UpKey).Returns(Constants.DownKey);
 
-        var actualGameState = gameState.Pac.Move(gameState);
+        var actualGameState = gameState.Pac.PlayTurn(gameState);
 
         _writer.Verify(_ => _.Write(Messages.WallObstruction), Times.Once);
         _reader.Verify(_ => _.ReadKey(), Times.Exactly(2));
@@ -114,16 +98,16 @@ public class PacTests
     [InlineData(Constants.DownKey, Constants.PacDown)]
     [InlineData(Constants.LeftKey, Constants.PacLeft)]
     [InlineData(Constants.RightKey, Constants.PacRight)]
-    public void Move_ShouldUpdatePacSymbolBasedOnDirection_WhenKeyPressed(string keyPress, char expectedSymbol)
+    public void PlayTurn_ShouldUpdatePacSymbolBasedOnDirection_WhenKeyPressed(string keyPress, char expectedSymbol)
     {
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 4),
-            Pac = _pac with { Coordinate = new Coordinate(1, 1) }
+            Pac = TestHelper.GetPac() with {Coordinate = new Coordinate(1, 1), MoveStrategy = _moveStrategy}
         };
         _reader.Setup(_ => _.ReadKey()).Returns(keyPress);
 
-        var actualGameState = gameState.Pac.Move(gameState);
+        var actualGameState = gameState.Pac.PlayTurn(gameState);
 
         Assert.Equal(expectedSymbol, actualGameState.Pac.Symbol);
     }

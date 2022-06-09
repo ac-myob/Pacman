@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Moq;
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
-using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
-using Pacman.Business.View;
 using Pacman.Variables;
 using Xunit;
 
@@ -14,73 +7,61 @@ namespace Pacman.Tests;
 
 public class GameStateModifierTests
 {
-    private readonly GameState _gameState = new(
-        It.IsAny<Size>(),
-        Constants.PacStartingLives,
-        It.IsAny<int>(),
-        It.IsAny<Pac>(),
-        It.IsAny<IEnumerable<BaseGhost>>(),
-        Array.Empty<Wall>(),
-        Array.Empty<Pellet>(),
-        Array.Empty<MagicPellet>()
-    );
-    private readonly Pac _pac = new(
-        It.IsAny<Coordinate>(), 
-        Constants.PacStart, 
-        It.IsAny<int>(),
-        It.IsAny<IReader>(), 
-        It.IsAny<IWriter>()
-    );
-    
     [Fact]
     public void UpdatePellets_ReturnsGameStateWithPelletsTraversedByPacmanRemoved_WhenGhostNotOnPellet()
     {
         var pacCoord = new Coordinate(0, 0);
         var ghostCoord = new Coordinate(1, 0);
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
-            Pac = _pac with { Coordinate = pacCoord },
-            Ghosts = new BaseGhost[] { new GreedyGhost(ghostCoord, It.IsAny<int>()) },
-            Pellets = new Pellet[] {new(pacCoord), new(ghostCoord)}
+            Pac = TestHelper.GetPac() with { Coordinate = pacCoord },
+            Ghosts = new[] { TestHelper.GetGhost() with{Coordinate = ghostCoord} },
+            Pellets = new Pellet[] {new(pacCoord, Constants.Pellet), new(ghostCoord, Constants.Pellet)}
         };
 
         var actualGameState = gameState.UpdatePellets();
         
-        Assert.Equal(new Pellet[] {new(ghostCoord)}, actualGameState.Pellets);
+        Assert.Equal(new Pellet[] {new(ghostCoord, Constants.Pellet)}, actualGameState.Pellets);
     }
     
     [Fact]
     public void UpdatePellets_ReturnsOriginalGameState_WhenTraversingPelletOccupiedByAGhost()
     {
         var coord = new Coordinate(0, 0);
-        var gameState = _gameState with
+        var gameState = TestHelper.GetGameState() with
         {
-            Pac = _pac with { Coordinate = coord },
-            Ghosts = new BaseGhost[] { new GreedyGhost(coord, It.IsAny<int>()) },
-            Pellets = new Pellet[] {new(coord)}
+            Pac = TestHelper.GetPac() with { Coordinate = coord },
+            Ghosts = new[] { TestHelper.GetGhost() with{Coordinate = coord} },
+            Pellets = new Pellet[] {new(coord, Constants.Pellet)}
         };
 
         var actualGameState = gameState.UpdatePellets();
         
-        Assert.Equal(new Pellet[] {new(coord)}, actualGameState.Pellets);
+        Assert.Equal(new Pellet[] {new(coord, Constants.Pellet)}, actualGameState.Pellets);
+    }
+
+    [Fact]
+    public void UpdatePowerUp_DecrementsRemainingPowerUpByOne_WhenRemainingPowerUpGreaterThanZero()
+    {
+        var gameState = TestHelper.GetGameState() with {PowerUpRemaining = Constants.PowerUpTurns};
+
+        var actualGameState = gameState.UpdatePowerUp();
+        
+        Assert.Equal(gameState.PowerUpRemaining - 1, actualGameState.PowerUpRemaining);
     }
     
     [Fact]
-    public void UpdateGhostCoordinate_ReturnsGameStateWithUpdatedGhostCoordinate_GivenIdAndNewCoordinate()
+    public void UpdatePowerUp_SetsPowerUpRemainingToTen_WhenPacTraversesMagicPellet()
     {
-        var newCoord = new Coordinate(4, 4);
-        var ghosts = new BaseGhost[]
+        var coordinate = new Coordinate(0, 0);
+        var gameState = TestHelper.GetGameState() with
         {
-            new RandomGhost(new Coordinate(0, 0), 0, It.IsAny<ISelector<Coordinate>>()),
-            new GreedyGhost(new Coordinate(0, 3), 1),
-            new PathFindingGhost(new Coordinate(2, 3), 2)
+            Pac = TestHelper.GetPac() with{Coordinate = coordinate},
+            Pellets = new[] {new Pellet(coordinate, Constants.MagicPellet)}
         };
-        var gameState = _gameState with {Ghosts = ghosts};
-        var expectedCoords = new[] {newCoord, new(0, 3), new(2, 3)};
 
-        var actualGameState = gameState.UpdateGhostCoordinate(0, newCoord);
-        var actualCoords = actualGameState.Ghosts.Select(g => g.Coordinate);
+        var actualGameState = gameState.UpdatePowerUp();
         
-        Assert.Equal(expectedCoords, actualCoords);
+        Assert.Equal(Constants.PowerUpTurns, actualGameState.PowerUpRemaining);
     }
 }
