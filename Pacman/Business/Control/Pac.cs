@@ -1,64 +1,39 @@
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
-using Pacman.Business.View;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public record Pac(Coordinate Coordinate, char Symbol, int Id, IReader Reader, IWriter Writer) : 
-    MovableEntity(Coordinate, Symbol, Id)
+public record Pac(Coordinate Coordinate, char Symbol, int Id, IMoveStrategy MoveStrategy) :
+    MovableEntity(Coordinate, Symbol, Id, MoveStrategy)
 {
-    private IWriter Writer { get; } = Writer;
-    private IReader Reader { get; } = Reader;
-
-    public override GameState Move(GameState gameState)
+    public override GameState PlayTurn(GameState gameState)
     {
-        var query = new Query(Reader, Writer);
-        string keyPress;
-        bool blockedByWall;
-        Coordinate newCoord;
-        
-        do
-        {
-            keyPress = query.GetKeyPress(Constants.ValidKeysRegex, Messages.InvalidKeyPress);
-            var chosenDirection = _getDirection(keyPress);
-            newCoord = gameState.GetNewCoord(Coordinate, chosenDirection, gameState.Walls);
-            blockedByWall = newCoord == Coordinate;
-
-            if (blockedByWall) Writer.Write(Messages.WallObstruction);
-
-        } while (blockedByWall);
+        var newCoord =  MoveStrategy.GetMove(this, gameState.Walls, gameState);
 
         return gameState with
         {
             Pac = gameState.Pac with
             {
                 Coordinate = newCoord,
-                Symbol = _getSymbol(keyPress)
+                Symbol = _getSymbol(Coordinate, newCoord)
             }
         };
     }
 
-    private static Direction _getDirection(string keyPress)
+    private char _getSymbol(Coordinate originalCoord, Coordinate newCoord)
     {
-        return keyPress switch
-        {
-            Constants.UpKey => Direction.North,
-            Constants.DownKey => Direction.South,
-            Constants.LeftKey => Direction.West,
-            Constants.RightKey => Direction.East,
-            _ => throw new ArgumentOutOfRangeException(keyPress)
-        };
-    }
+        var (x1, y1) = originalCoord;
+        var (x2, y2) = newCoord;
+        var coordDisplacement = (x2 - x1, y2 - y1);
 
-    private static char _getSymbol(string keyPress)
-    {
-        return keyPress switch
+        return coordDisplacement switch
         {
-            Constants.UpKey => Constants.PacUp,
-            Constants.DownKey => Constants.PacDown,
-            Constants.LeftKey => Constants.PacLeft,
-            Constants.RightKey => Constants.PacRight,
-            _ => throw new ArgumentOutOfRangeException(keyPress)
+            (_, > 0) => Constants.PacDown,
+            (_, < 0) => Constants.PacUp,
+            (< 0, _) => Constants.PacLeft,
+            (> 0, _) => Constants.PacRight,
+            _ => throw new ArgumentOutOfRangeException()
         };
     }
 }

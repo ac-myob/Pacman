@@ -1,7 +1,9 @@
+using Pacman.Business.Control.MoveStrategies;
+
 namespace Pacman.Business.Model;
 
-public abstract record MovableEntity(Coordinate Coordinate, char Symbol, int Id) : Entity(Coordinate, Symbol)
-{
-    public int Id { get; } = Id;
-    public abstract GameState Move(GameState gameState);
+public abstract record MovableEntity(Coordinate Coordinate, char Symbol, int Id, IMoveStrategy MoveStrategy) : 
+    Entity(Coordinate, Symbol)
+{ 
+    public abstract GameState PlayTurn(GameState gameState);
 }

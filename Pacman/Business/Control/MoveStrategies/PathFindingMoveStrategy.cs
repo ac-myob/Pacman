@@ -1,19 +1,18 @@
 using Pacman.Business.Model;
 using Pacman.Variables;
 
-namespace Pacman.Business.Control.Ghosts;
+namespace Pacman.Business.Control.MoveStrategies;
 
-public record PathFindingGhost(Coordinate Coordinate, int Id) : BaseGhost(Coordinate, Constants.PathFindingGhost, Id)
+public class PathFindingMoveStrategy : IMoveStrategy
 {
-    public override GameState Move(GameState gameState)
+    public Coordinate GetMove(MovableEntity movableEntity, IEnumerable<Entity> obstacles, GameState gameState)
     {
-        // var ghostCoord = gameState.GetMovableEntities().ElementAt(Id).Coordinate;
-        if (gameState.Pac.Coordinate == Coordinate) return gameState;
-
-        var obstacles = gameState.Walls.Cast<Entity>().Concat(gameState.Ghosts).ToArray();
+        var coordinate = movableEntity.Coordinate;
+        if (gameState.Pac.Coordinate == coordinate) return coordinate;
+        
         var possiblePaths = new Queue<Coordinate[]>();
         possiblePaths.Enqueue(Array.Empty<Coordinate>());
-        
+        var obstaclesArr = obstacles.ToArray();
         Coordinate[] dequeuedCoords;
         Coordinate lastDequeuedCoord;
         var visitedCoords = new HashSet<Coordinate>();
@@ -24,16 +23,16 @@ public record PathFindingGhost(Coordinate Coordinate, int Id) : BaseGhost(Coordi
             try
             {
                 dequeuedCoords = possiblePaths.Dequeue().ToArray();
-                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : Coordinate;
+                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : coordinate;
             }
             catch (InvalidOperationException)
             {
-                return gameState;
+                return coordinate;
             }
 
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
-                var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstacles);
+                var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstaclesArr);
                 
                 if (currCoord == lastDequeuedCoord || visitedCoords.Contains(currCoord)) continue;
 
@@ -46,6 +45,6 @@ public record PathFindingGhost(Coordinate Coordinate, int Id) : BaseGhost(Coordi
 
         } while (lastDequeuedCoord != gameState.Pac.Coordinate);
 
-        return gameState.UpdateGhostCoordinate(Id, dequeuedCoords.First());
+        return dequeuedCoords.First();
     }
 }

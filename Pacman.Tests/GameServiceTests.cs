@@ -2,11 +2,11 @@ using System;
 using System.Linq;
 using Moq;
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
-using Pacman.Business.Control.Selector;
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Exceptions;
+using Pacman.Variables;
 using Xunit;
 
 namespace Pacman.Tests;
@@ -68,7 +68,8 @@ public class GameServiceTests
     {
         var expectedRandomGhostCoord = new Coordinate(1, 2);
         var actualGameState = _gameService.GetNewGameState(TestGame);
-        var randomGhosts = actualGameState.Ghosts.Where(g => g.GetType() == typeof(RandomGhost));
+        var randomGhosts = actualGameState.Ghosts.
+            Where(g => g.MoveStrategy.GetType() == typeof(RandomMoveStrategy));
 
         Assert.Contains(randomGhosts, g => g.Coordinate == expectedRandomGhostCoord);
     }
@@ -78,7 +79,8 @@ public class GameServiceTests
     {
         var expectedGreedyGhostCoord = new Coordinate(0, 2);
         var actualGameState = _gameService.GetNewGameState(TestGame);
-        var randomGhosts = actualGameState.Ghosts.Where(g => g.GetType() == typeof(GreedyGhost));
+        var randomGhosts = actualGameState.Ghosts.
+            Where(g => g.MoveStrategy.GetType() == typeof(GreedyMoveStrategy));
 
         Assert.Contains(randomGhosts, g => g.Coordinate == expectedGreedyGhostCoord);
     }
@@ -88,7 +90,8 @@ public class GameServiceTests
     {
         var expectedPathFindingGhostCoord = new Coordinate(1, 3);
         var actualGameState = _gameService.GetNewGameState(TestGame);
-        var randomGhosts = actualGameState.Ghosts.Where(g => g.GetType() == typeof(PathFindingGhost));
+        var randomGhosts = actualGameState.Ghosts.
+            Where(g => g.MoveStrategy.GetType() == typeof(PathFindingMoveStrategy));
 
         Assert.Contains(randomGhosts, g => g.Coordinate == expectedPathFindingGhostCoord);
     }
@@ -138,11 +141,11 @@ public class GameServiceTests
     {
         var gameState = _gameService.GetNewGameState(TestGame);
         var expectedGhostCoords = gameState.Ghosts.Select(g => g.Coordinate);
-        var ghosts = new BaseGhost[]
+        var ghosts = new[]
         {
-            new RandomGhost(new Coordinate(0, 0), It.IsAny<int>(), It.IsAny<ISelector<Coordinate>>()),
-            new GreedyGhost(new Coordinate(0, 3), It.IsAny<int>()),
-            new PathFindingGhost(new Coordinate(2, 3), It.IsAny<int>())
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(0, 0)},
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(0, 3)},
+            TestHelper.GetGhost() with{Coordinate = new Coordinate(2, 3)},
         };
         gameState = gameState with
         {
@@ -155,9 +158,9 @@ public class GameServiceTests
     }
 
     [Theory]
-    [InlineData(2, typeof(RandomGhost))]
-    [InlineData(3, typeof(GreedyGhost))]
-    [InlineData(4, typeof(PathFindingGhost))]
+    [InlineData(2, typeof(RandomMoveStrategy))]
+    [InlineData(3, typeof(GreedyMoveStrategy))]
+    [InlineData(4, typeof(PathFindingMoveStrategy))]
     public void GetNextRoundGameState_ReturnsGameStateWithAdditionalGhostBasedOnRoundNumber(int round, Type typeOfGhost)
     {
         var gameState = _gameService.GetNewGameState(TestGame) with {Round = round};
@@ -166,7 +169,7 @@ public class GameServiceTests
             nextGameState = _gameService.GetNextRoundGameState(nextGameState);
 
         Assert.Equal(gameState.Ghosts.Count() + round - 1, nextGameState.Ghosts.Count());
-        Assert.Equal(typeOfGhost, nextGameState.Ghosts.Last().GetType());
+        Assert.Equal(typeOfGhost, nextGameState.Ghosts.Last().MoveStrategy.GetType());
     }
 
     [Fact]
@@ -203,7 +206,7 @@ public class GameServiceTests
     {
         var gameState = _gameService.GetNewGameState(TestGame) with
         {
-            Pellets = new Pellet[] {new(new Coordinate(0, 0))}
+            Pellets = new Pellet[] {new(new Coordinate(0, 0), Constants.Pellet)}
         };
         var expectedPelletCoords = gameState.Pellets.Select(p => p.Coordinate);
 

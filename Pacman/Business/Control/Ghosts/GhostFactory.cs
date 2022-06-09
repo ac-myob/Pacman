@@ -1,19 +1,42 @@
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public static class GhostFactory
-{ 
-    public static BaseGhost GetGhost(GhostType ghostType, Coordinate coordinate, int id)
+public class GhostFactory
+{
+    private readonly ISelector<Coordinate> _selector;
+
+    public GhostFactory(ISelector<Coordinate> selector)
     {
-        return ghostType switch
+        _selector = selector;
+    }
+    
+    public Ghost GetGhost(GhostType ghostType, Coordinate coordinate, int id)
+    {
+        IMoveStrategy moveStrategy;
+        char symbol;
+
+        switch (ghostType)
         {
-            GhostType.Random => new RandomGhost(coordinate, id, new RandomSelector<Coordinate>()),
-            GhostType.Greedy => new GreedyGhost(coordinate, id),
-            GhostType.PathFinding => new PathFindingGhost(coordinate, id),
-            _ => throw new ArgumentOutOfRangeException(nameof(ghostType), ghostType, null)
-        };
+            case GhostType.Random:
+                moveStrategy = new RandomMoveStrategy(_selector);
+                symbol = Constants.RandomGhost;
+                break;
+            case GhostType.Greedy:
+                moveStrategy = new GreedyMoveStrategy();
+                symbol = Constants.GreedyGhost;
+                break;
+            case GhostType.PathFinding:
+                moveStrategy = new PathFindingMoveStrategy();
+                symbol = Constants.PathFindingGhost;
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(ghostType), ghostType, null);
+        }
+
+        return new Ghost(coordinate, symbol, id, moveStrategy);
     }
 }

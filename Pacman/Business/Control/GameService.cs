@@ -1,4 +1,5 @@
 using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Control.Sequence;
 using Pacman.Business.Model;
@@ -15,12 +16,14 @@ public class GameService
     private readonly ISelector<Coordinate> _selector = new RandomSelector<Coordinate>();
     private readonly NumberSequence _numberSequence = new(Constants.StartingId);
     private readonly GhostTypeSequence _ghostTypeSequence = new();
+    private readonly GhostFactory _ghostFactory;
     private GameState? _initialGameState;
 
     public GameService(IReader reader, IWriter writer)
     {
         _reader = reader;
         _writer = writer;
+        _ghostFactory = new GhostFactory(_selector);
     }
 
     public GameState GetNewGameState(string filepath)
@@ -40,13 +43,11 @@ public class GameService
             _getPacCoord(fileLines, size), 
             Constants.PacStart,
             _numberSequence.GetNext(),
-            _reader, 
-            _writer);
+            new PacMoveStrategy(_reader, _writer));
         var walls = new List<Wall>();
-        var ghosts = new List<BaseGhost>();
+        var ghosts = new List<Ghost>();
         var pellets = new List<Pellet>();
-        var magicPellets = new List<MagicPellet>();
-        
+
         for (var l = 0; l < length; l++)
             for (var w = 0; w < width; w++)
             {
@@ -57,24 +58,24 @@ public class GameService
                         walls.Add(new Wall(currentCoord));
                         break;
                     case Constants.RandomGhost:
-                        ghosts.Add(new RandomGhost(currentCoord, _numberSequence.GetNext(), _selector));
+                        ghosts.Add(_ghostFactory.GetGhost(GhostType.Random, currentCoord, _numberSequence.GetNext()));
                         break;
                     case Constants.GreedyGhost:
-                        ghosts.Add(new GreedyGhost(currentCoord, _numberSequence.GetNext()));
+                        ghosts.Add(_ghostFactory.GetGhost(GhostType.Greedy, currentCoord, _numberSequence.GetNext()));
                         break;
                     case Constants.PathFindingGhost:
-                        ghosts.Add(new PathFindingGhost(currentCoord, _numberSequence.GetNext()));
+                        ghosts.Add(_ghostFactory.GetGhost(GhostType.PathFinding, currentCoord, _numberSequence.GetNext()));
                         break;
                     case Constants.Pellet:
-                        pellets.Add(new Pellet(currentCoord));
+                        pellets.Add(new Pellet(currentCoord, Constants.Pellet));
                         break;
                     case Constants.MagicPellet:
-                        magicPellets.Add(new MagicPellet(currentCoord));
+                        pellets.Add(new Pellet(currentCoord, Constants.MagicPellet));
                         break;
                 }
             }
         
-        return _initialGameState = new GameState(size, Constants.PacStartingLives, Constants.StartRound, pac, ghosts, walls, pellets, magicPellets);
+        return _initialGameState = new GameState(size, Constants.PacStartingLives, 0, Constants.StartRound, pac, ghosts, walls, pellets);
     }
 
     private static Coordinate _getPacCoord(IReadOnlyList<string> fileLines, Size size)
@@ -106,7 +107,8 @@ public class GameService
             throw new InvalidOperationException();
 
         _initialGameState = _initialGameState with
-        {
+        {   
+            Lives = gameState.Lives,
             Round = gameState.Round + 1,
             Ghosts = _getNewGhosts(),
         };
@@ -114,7 +116,7 @@ public class GameService
         return _initialGameState;
     }
 
-    private IEnumerable<BaseGhost> _getNewGhosts()
+    private IEnumerable<Ghost> _getNewGhosts()
     {
         var newGhostType = _ghostTypeSequence.GetNext();
         var posNewGhostCoords = _initialGameState!.Pellets.Select(p => p.Coordinate).
@@ -124,7 +126,7 @@ public class GameService
         if (!posNewGhostCoords.Any()) return _initialGameState.Ghosts;
         
         var newGhostCoord = _selector.SelectFrom(posNewGhostCoords);
-        var newGhost = GhostFactory.GetGhost(newGhostType, newGhostCoord, _numberSequence.GetNext());
+        var newGhost = _ghostFactory.GetGhost(newGhostType, newGhostCoord, _numberSequence.GetNext());
 
         return _initialGameState.Ghosts.Append(newGhost);
     }
@@ -133,7 +135,7 @@ public class GameService
     {
         if (_initialGameState is null)
             throw new InvalidOperationException();
-        
+
         return _initialGameState with
         {
             Lives = gameState.Lives - 1,
