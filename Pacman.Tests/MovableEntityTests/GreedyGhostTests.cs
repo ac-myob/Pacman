@@ -19,7 +19,7 @@ public class GreedyGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, Id = 0},
+            Pac = TestHelper.GetPac() with {Coordinate = pacCoord},
             Ghosts = new[] {TestHelper.GetGhost() with {Coordinate = ghostCoord, Id = 1, MoveStrategy = _moveStrategy}}
         };
 
@@ -36,7 +36,7 @@ public class GreedyGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, Id = 0},
+            Pac = TestHelper.GetPac() with {Coordinate = pacCoord},
             Ghosts = new[] {TestHelper.GetGhost() with {Coordinate = ghostCoord, MoveStrategy = new GreedyMoveStrategy(), Id = 1}},
             Walls = walls
         };
@@ -54,7 +54,7 @@ public class GreedyGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, Id = 0},
+            Pac = TestHelper.GetPac() with {Coordinate = pacCoord},
             Ghosts = new[] {TestHelper.GetGhost() with {Coordinate = ghostCoord, MoveStrategy = new GreedyMoveStrategy(), Id = 1}}.Concat(ghosts)
         };
         

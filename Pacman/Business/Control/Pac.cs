@@ -4,8 +4,8 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public record Pac(Coordinate Coordinate, char Symbol, int Id, IMoveStrategy MoveStrategy) :
-    MovableEntity(Coordinate, Symbol, Id, MoveStrategy)
+public record Pac(Coordinate Coordinate, char Symbol, IMoveStrategy MoveStrategy) :
+    MovableEntity(Coordinate, Symbol, MoveStrategy)
 {
     public override GameState PlayTurn(GameState gameState)
     {

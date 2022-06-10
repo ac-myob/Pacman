@@ -14,7 +14,6 @@ public static class TestHelper
     {
         return new Pac(It.IsAny<Coordinate>(),
             Constants.PacStart,
-            It.IsAny<int>(),
             It.IsAny<IMoveStrategy>());
     }
 

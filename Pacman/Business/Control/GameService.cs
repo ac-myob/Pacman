@@ -42,7 +42,6 @@ public class GameService
         var pac = new Pac(
             _getPacCoord(fileLines, size), 
             Constants.PacStart,
-            _numberSequence.GetNext(),
             new PacMoveStrategy(_reader, _writer));
         var walls = new List<Wall>();
         var ghosts = new List<Ghost>();

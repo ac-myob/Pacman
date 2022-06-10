@@ -17,7 +17,7 @@ public class PathFindingGhostTests
     {
         var gameState = TestHelper.GetGameState() with
         {
-            Pac = TestHelper.GetPac() with{Coordinate = pacCoord, Id = 0},
+            Pac = TestHelper.GetPac() with{Coordinate = pacCoord},
             Size = mapSize,
             Ghosts = new[]
             {
@@ -43,7 +43,7 @@ public class PathFindingGhostTests
         var gameState = TestHelper.GetGameState() with
         {            
             Size = mapSize,
-            Pac = TestHelper.GetPac() with{Coordinate = pacCoord, Id = 0},
+            Pac = TestHelper.GetPac() with{Coordinate = pacCoord},
             Ghosts = new[]
             {
                 TestHelper.GetGhost() with

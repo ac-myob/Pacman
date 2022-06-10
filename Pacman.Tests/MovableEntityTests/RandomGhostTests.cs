@@ -27,7 +27,7 @@ public class RandomGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = TestHelper.GetPac() with{Id = 0},
+            Pac = TestHelper.GetPac(),
             Ghosts = new[]
             {
                 TestHelper.GetGhost() with
@@ -62,7 +62,7 @@ public class RandomGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Pac = TestHelper.GetPac() with{Id = 0},
+            Pac = TestHelper.GetPac(),
             Ghosts = new[]
             {
                 TestHelper.GetGhost() with
@@ -91,7 +91,7 @@ public class RandomGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Pac = TestHelper.GetPac() with{Id = 0},
+            Pac = TestHelper.GetPac(),
             Ghosts = new[]
             {
                 TestHelper.GetGhost() with
