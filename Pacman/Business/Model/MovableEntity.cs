@@ -1,9 +1,13 @@
-using Pacman.Business.Control.MoveStrategies;
-
 namespace Pacman.Business.Model;
 
-public abstract record MovableEntity(Coordinate Coordinate, char Symbol, IMoveStrategy MoveStrategy) : 
-    Entity(Coordinate, Symbol)
-{ 
-    public abstract GameState PlayTurn(GameState gameState);
+public abstract class MovableEntity : Entity {
+    
+    private readonly Coordinate _startingCoordinate;
+
+    protected MovableEntity(Coordinate coordinate, char symbol) : base(coordinate, symbol)
+    {
+        _startingCoordinate = coordinate;
+    }
+
+    public void ResetCoordinate() => Coordinate = _startingCoordinate;
 }
