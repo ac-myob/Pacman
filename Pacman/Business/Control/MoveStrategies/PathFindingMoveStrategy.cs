@@ -32,7 +32,7 @@ public class PathFindingMoveStrategy : IMoveStrategy
 
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
-                var currCoord = gameState.GameStateExtensions(lastDequeuedCoord, direction, obstaclesArr);
+                var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstaclesArr);
                 
                 if (currCoord == lastDequeuedCoord || visitedCoords.Contains(currCoord)) continue;
 

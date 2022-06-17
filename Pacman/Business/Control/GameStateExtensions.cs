@@ -4,9 +4,9 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public static class GameStateQuery
+public static class GameStateExtensions
 {
-    public static Coordinate GameStateExtensions(
+    public static Coordinate GetNewCoord(
         this GameState gameState, Coordinate coordinate, Direction direction, IEnumerable<Entity> obstacles)
     {
         var (x, y) = coordinate;
@@ -52,7 +52,7 @@ public static class GameStateQuery
     public static bool IsDirectionValid(this GameState gameState, Direction direction)
     {
         var currentPacCoord = gameState.Pac.Coordinate;
-        var newPacCoord = gameState.GameStateExtensions(currentPacCoord, direction, gameState.Walls);
+        var newPacCoord = gameState.GetNewCoord(currentPacCoord, direction, gameState.Walls);
 
         return currentPacCoord != newPacCoord;
     }

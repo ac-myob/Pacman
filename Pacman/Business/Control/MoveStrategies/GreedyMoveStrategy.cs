@@ -15,7 +15,7 @@ public class GreedyMoveStrategy : IMoveStrategy
         
         foreach (Direction direction in Enum.GetValues(typeof(Direction)))
         {
-            var currentCoord = gameState.GameStateExtensions(startingCoord, direction, obstaclesArr);
+            var currentCoord = gameState.GetNewCoord(startingCoord, direction, obstaclesArr);
             var currentDistance = gameState.Pac.Coordinate.GetDistance(currentCoord);
             
             if (currentDistance >= bestDistance) continue;

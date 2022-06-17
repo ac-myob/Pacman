@@ -19,7 +19,7 @@ public class RandomMoveStrategy : IMoveStrategy
         var obstaclesArr = obstacles.ToArray();
         var posCoords = 
             (from Direction direction in Enum.GetValues(typeof(Direction)) 
-                select gameState.GameStateExtensions(startingCoord, direction, obstaclesArr) into currentCoord 
+                select gameState.GetNewCoord(startingCoord, direction, obstaclesArr) into currentCoord 
                 where currentCoord != startingCoord select currentCoord).ToArray();
 
         return !posCoords.Any() ? startingCoord : _selector.SelectFrom(posCoords);

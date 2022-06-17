@@ -4,34 +4,17 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Model;
 
-public class GameState
+public record GameState(Size Size,
+    int Lives,
+    int Round,
+    Pac Pac,
+    IEnumerable<Ghost> Ghosts,
+    IEnumerable<Wall> Walls,
+    IEnumerable<Pellet> Pellets)
 {
-    public Size Size { get; }
-    public int Lives { get; private set; }
+    public int Lives { get; private set; } = Lives;
     public int PowerUpRemaining { get; private set; }
-    public int Round { get; private set; }
-    public Pac Pac { get; }
-    public IEnumerable<Ghost> Ghosts { get; }
-    public IEnumerable<Wall> Walls { get; }
-    public IEnumerable<Pellet> Pellets { get; }
-
-    public GameState(
-        Size size,
-        int lives,
-        int round,
-        Pac pac,
-        IEnumerable<Ghost> ghosts,
-        IEnumerable<Wall> walls,
-        IEnumerable<Pellet> pellets)
-    {
-        Size = size;
-        Lives = lives;
-        Round = round;
-        Pac = pac;
-        Ghosts = ghosts;
-        Walls = walls;
-        Pellets = pellets;
-    }
+    public int Round { get; private set; } = Round;
 
     public void DecreaseLife() => Lives = Math.Max(0, Lives - 1);
 

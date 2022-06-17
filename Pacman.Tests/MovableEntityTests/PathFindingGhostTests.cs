@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
+using Pacman.Business.Control;
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
 using Xunit;
@@ -17,22 +20,14 @@ public class PathFindingGhostTests
     {
         var gameState = TestHelper.GetGameState() with
         {
-            Pac = TestHelper.GetPac() with{Coordinate = pacCoord},
+            Pac = new Pac(pacCoord, It.IsAny<char>()),
             Size = mapSize,
-            Ghosts = new[]
-            {
-                TestHelper.GetGhost() with
-                {
-                    Coordinate = ghostCoord, 
-                    MoveStrategy = _moveStrategy, 
-                    Id = 1
-                }
-            }
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), new PathFindingMoveStrategy())}
         };
 
-        var actualGameState = gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().PlayTurn(gameState);
         
-        Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
+        Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
@@ -43,22 +38,14 @@ public class PathFindingGhostTests
         var gameState = TestHelper.GetGameState() with
         {            
             Size = mapSize,
-            Pac = TestHelper.GetPac() with{Coordinate = pacCoord},
-            Ghosts = new[]
-            {
-                TestHelper.GetGhost() with
-                {
-                    Coordinate = ghostCoord, 
-                    MoveStrategy = _moveStrategy, 
-                    Id = 1
-                }
-            },
-            Walls = walls
+            Pac = new Pac(pacCoord, It.IsAny<char>()),
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)},
+            Walls = walls,
         };
 
-        var actualGameState = gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().PlayTurn(gameState);
         
-        Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
+        Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     private static IEnumerable<object[]> NoObstaclesTestData()

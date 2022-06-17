@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
+using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Control.Selector;
@@ -27,16 +28,8 @@ public class RandomGhostTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = TestHelper.GetPac(),
-            Ghosts = new[]
-            {
-                TestHelper.GetGhost() with
-                {
-                    Coordinate = new Coordinate(1, 1), 
-                    MoveStrategy = _moveStrategy,
-                    Id = 1
-                }
-            }
+            Pac = new Pac(new Coordinate(), It.IsAny<char>()),
+            Ghosts = new[] {new Ghost(new Coordinate(1, 1), It.IsAny<char>(), _moveStrategy)},
         };
         var expectedPosCoords = new[]
         {
@@ -57,21 +50,13 @@ public class RandomGhostTests
     [Theory]
     [MemberData(nameof(WallsTestData))]
     public void PlayTurn_MovesGhostToRandomValidPosition_GivenWalls(
-        Size size, Coordinate ghostStartCoord, IEnumerable<Wall> walls, IEnumerable<Coordinate> expectedPosCoords)
+        Size size, Coordinate ghostCoord, IEnumerable<Wall> walls, IEnumerable<Coordinate> expectedPosCoords)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Pac = TestHelper.GetPac(),
-            Ghosts = new[]
-            {
-                TestHelper.GetGhost() with
-                {
-                    Coordinate = ghostStartCoord, 
-                    MoveStrategy = _moveStrategy,
-                    Id = 1
-                }
-            },
+            Pac = new Pac(new Coordinate(), It.IsAny<char>()),
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)},
             Walls = walls
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
@@ -86,21 +71,13 @@ public class RandomGhostTests
     [Theory]
     [MemberData(nameof(GhostsTestData))]
     public void PlayTurn_MovesGhostToRandomValidPosition_GivenGhosts(
-        Size size, Coordinate ghostStartCoord, IEnumerable<Ghost> ghosts, IEnumerable<Coordinate> expectedPosCoords)
+        Size size, Coordinate ghostCoord, IEnumerable<Ghost> ghosts, IEnumerable<Coordinate> expectedPosCoords)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Pac = TestHelper.GetPac(),
-            Ghosts = new[]
-            {
-                TestHelper.GetGhost() with
-                {
-                    Coordinate = ghostStartCoord, 
-                    MoveStrategy = _moveStrategy,
-                    Id = 1
-                }
-            }.Concat(ghosts)
+            Pac = new Pac(new Coordinate(), It.IsAny<char>()),
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)}.Concat(ghosts)
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
@@ -152,7 +129,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new[] {TestHelper.GetGhost() with{Coordinate = new Coordinate(1, 0)}},
+            new[] {new Ghost(new Coordinate(1, 0), It.IsAny<char>(), It.IsAny<IMoveStrategy>())},
             new Coordinate[] {new(1, 2), new(2, 1), new(0, 1)}
         };
     }

@@ -9,7 +9,7 @@ public class Pac : MovableEntity
     
     public void PlayTurn(GameState gameState, Direction direction)
     {
-        Coordinate = gameState.GameStateExtensions(Coordinate, direction, gameState.Walls);
+        Coordinate = gameState.GetNewCoord(Coordinate, direction, gameState.Walls);
         Symbol = GetSymbol(direction);
     }
 
