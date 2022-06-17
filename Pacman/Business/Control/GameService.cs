@@ -15,7 +15,7 @@ public class GameService : IGameService
         var randomSelector = new RandomSelector<Coordinate>();
         var ghostFactory = new GhostFactory(randomSelector);
         var worldBuilder = new WorldBuilder(new FileLoader(Constants.GameFilepath), ghostFactory);
-        _gameEngine = new GameEngine(worldBuilder.Build(), ghostFactory, randomSelector);
+        _gameEngine = new GameEngine(worldBuilder.GetEntities(), ghostFactory, randomSelector);
     }
     
     public void PlayRound(Direction inputDirection) => _gameEngine.PlayRound(inputDirection);

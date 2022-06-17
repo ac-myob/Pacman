@@ -6,27 +6,27 @@ namespace Pacman.Business.Control;
 
 public class WorldBuilder
 {
-    private readonly IWorldLoader _worldLoader;
+    private readonly char[,] _world;
     private readonly GhostFactory _ghostFactory;
 
     public WorldBuilder(IWorldLoader worldLoader, GhostFactory ghostFactory)
     {
-        _worldLoader = worldLoader;
+        _world = worldLoader.LoadWorld();
         _ghostFactory = ghostFactory;
     }
 
-    public (Size, IEnumerable<Entity>) Build()
+    public IEnumerable<Entity> GetEntities()
     {
-        var world = _worldLoader.LoadWorld();
-        var worldSize = new Size(world.GetLength(1), world.GetLength(0));
-        var pac = new Pac(_getPacCoord(world, worldSize), Constants.PacStart);
+        var width = _world.GetLength(1);
+        var length = _world.GetLength(0);
+        var pac = new Pac(GetPacCoord(_world, width, length), Constants.PacStart);
         var worldEntities = new List<Entity>{pac};
 
-        for (var l = 0; l < worldSize.Length; l++)
-            for (var w = 0; w < worldSize.Width; w++)
+        for (var l = 0; l < length; l++)
+            for (var w = 0; w < width; w++)
             {
                 var currentCoord = new Coordinate(w, l);
-                Entity? currentEntity = world[l, w] switch
+                Entity? currentEntity = _world[l, w] switch
                 {
                     Constants.Wall => new Wall(currentCoord),
                     Constants.Pellet => new Pellet(currentCoord, Constants.Pellet),
@@ -41,13 +41,11 @@ public class WorldBuilder
                     worldEntities.Add(currentEntity);
             }
 
-        return (worldSize, worldEntities);
+        return worldEntities;
     }
 
-    private static Coordinate _getPacCoord(char[,] world, Size size)
+    private static Coordinate GetPacCoord(char[,] world, int width, int length)
     {
-        var (width, length) = size;
-
         for (var l = 0; l < length; l++)
             for (var w = 0; w < width; w++)
                 if (world[l, w] == Constants.PacStart)

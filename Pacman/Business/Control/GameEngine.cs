@@ -18,18 +18,22 @@ public class GameEngine
     private readonly ISelector<Coordinate> _selector;
     private readonly GhostTypeSequence _ghostTypeSequence = new();
 
-    public GameEngine((Size, IEnumerable<Entity>) worldInfo, GhostFactory ghostFactory, ISelector<Coordinate> selector)
+    public GameEngine(IEnumerable<Entity> entities, GhostFactory ghostFactory, ISelector<Coordinate> selector)
     {
         _ghostFactory = ghostFactory;
         _selector = selector;
-        InitialiseEntities(worldInfo);
+        InitialiseEntities(entities);
     }
 
-    private void InitialiseEntities((Size, IEnumerable<Entity>) worldInfo)
+    private void InitialiseEntities(IEnumerable<Entity> entities)
     {
-        var (size, entities) = worldInfo;
-
+        int length = 0, width = 0;
+        
         foreach (var entity in entities)
+        {
+            length = Math.Max(length, entity.Coordinate.Y + 1);
+            width = Math.Max(width, entity.Coordinate.X + 1);
+            
             switch (entity.Symbol)
             {
                 case Constants.Wall:
@@ -48,8 +52,9 @@ public class GameEngine
                     _pac = (Pac) entity;
                     break;
             }
+        }
 
-        GameState = new GameState(size, Constants.PacStartingLives, Constants.StartRound, 
+        GameState = new GameState(new Size(width, length), Constants.PacStartingLives, Constants.StartRound, 
             _pac, _ghosts, _walls.Values, _pellets.Values);
     }
     
