@@ -1,3 +1,4 @@
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
@@ -5,17 +6,16 @@ namespace Pacman.Business.Control.MoveStrategies;
 
 public class GreedyMoveStrategy : IMoveStrategy
 {
-    public Coordinate GetMove(MovableEntity movableEntity, IEnumerable<Entity> obstacles, GameState gameState)
+    public Coordinate GetMove(Coordinate startingCoord, IEnumerable<Entity> obstacles, GameState gameState)
     {
         var obstaclesArr = obstacles.ToArray();
-        var coordinate = movableEntity.Coordinate;
-        if (gameState.Pac.Coordinate == coordinate) return coordinate;
-        var bestDistance = gameState.Pac.Coordinate.GetDistance(coordinate);
-        var bestCoord = coordinate;
+        if (gameState.Pac.Coordinate == startingCoord) return startingCoord;
+        var bestDistance = gameState.Pac.Coordinate.GetDistance(startingCoord);
+        var bestCoord = startingCoord;
         
         foreach (Direction direction in Enum.GetValues(typeof(Direction)))
         {
-            var currentCoord = gameState.GetNewCoord(coordinate, direction, obstaclesArr);
+            var currentCoord = gameState.GameStateExtensions(startingCoord, direction, obstaclesArr);
             var currentDistance = gameState.Pac.Coordinate.GetDistance(currentCoord);
             
             if (currentDistance >= bestDistance) continue;

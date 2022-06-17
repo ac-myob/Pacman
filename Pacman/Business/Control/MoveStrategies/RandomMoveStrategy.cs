@@ -1,3 +1,4 @@
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
 using Pacman.Variables;
@@ -13,15 +14,14 @@ public class RandomMoveStrategy : IMoveStrategy
         _selector = selector;
     }
     
-    public Coordinate GetMove(MovableEntity movableEntity, IEnumerable<Entity> obstacles, GameState gameState)
+    public Coordinate GetMove(Coordinate startingCoord, IEnumerable<Entity> obstacles, GameState gameState)
     {
         var obstaclesArr = obstacles.ToArray();
-        var coordinate = movableEntity.Coordinate;
         var posCoords = 
             (from Direction direction in Enum.GetValues(typeof(Direction)) 
-                select gameState.GetNewCoord(coordinate, direction, obstaclesArr) into currentCoord 
-                where currentCoord != coordinate select currentCoord).ToArray();
+                select gameState.GameStateExtensions(startingCoord, direction, obstaclesArr) into currentCoord 
+                where currentCoord != startingCoord select currentCoord).ToArray();
 
-        return !posCoords.Any() ? coordinate : _selector.SelectFrom(posCoords);
+        return !posCoords.Any() ? startingCoord : _selector.SelectFrom(posCoords);
     }
 }

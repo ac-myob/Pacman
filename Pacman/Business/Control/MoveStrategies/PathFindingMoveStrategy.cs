@@ -1,3 +1,4 @@
+using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
@@ -5,10 +6,9 @@ namespace Pacman.Business.Control.MoveStrategies;
 
 public class PathFindingMoveStrategy : IMoveStrategy
 {
-    public Coordinate GetMove(MovableEntity movableEntity, IEnumerable<Entity> obstacles, GameState gameState)
+    public Coordinate GetMove(Coordinate startingCoord, IEnumerable<Entity> obstacles, GameState gameState)
     {
-        var coordinate = movableEntity.Coordinate;
-        if (gameState.Pac.Coordinate == coordinate) return coordinate;
+        if (gameState.Pac.Coordinate == startingCoord) return startingCoord;
         
         var possiblePaths = new Queue<Coordinate[]>();
         possiblePaths.Enqueue(Array.Empty<Coordinate>());
@@ -23,16 +23,16 @@ public class PathFindingMoveStrategy : IMoveStrategy
             try
             {
                 dequeuedCoords = possiblePaths.Dequeue().ToArray();
-                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : coordinate;
+                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : startingCoord;
             }
             catch (InvalidOperationException)
             {
-                return coordinate;
+                return startingCoord;
             }
 
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
-                var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstaclesArr);
+                var currCoord = gameState.GameStateExtensions(lastDequeuedCoord, direction, obstaclesArr);
                 
                 if (currCoord == lastDequeuedCoord || visitedCoords.Contains(currCoord)) continue;
 
