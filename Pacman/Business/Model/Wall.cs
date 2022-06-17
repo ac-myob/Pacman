@@ -2,5 +2,9 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Model;
 
-public record Wall(Coordinate Coordinate) : Entity(Coordinate, Constants.Wall);
-
+public class Wall : Entity
+{
+    public Wall(Coordinate coordinate) : base(coordinate, Constants.Wall)
+    {
+    }
+}

@@ -1,3 +1,11 @@
 namespace Pacman.Business.Model;
 
-public record Pellet(Coordinate Coordinate, char Symbol) : Entity(Coordinate, Symbol);
+public class Pellet : Entity
+{
+    public bool Eaten { get; set; }
+
+    public Pellet(Coordinate coordinate, char symbol, bool eaten = false) : base(coordinate, symbol)
+    {
+        Eaten = eaten;
+    }
+}

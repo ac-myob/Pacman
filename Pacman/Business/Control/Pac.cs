@@ -1,39 +1,29 @@
-using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public record Pac(Coordinate Coordinate, char Symbol, IMoveStrategy MoveStrategy) :
-    MovableEntity(Coordinate, Symbol, MoveStrategy)
+public class Pac : MovableEntity
 {
-    public override GameState PlayTurn(GameState gameState)
+    public Pac(Coordinate coordinate, char symbol) : base(coordinate, symbol) { }
+    
+    public void PlayTurn(GameState gameState, Direction direction)
     {
-        var newCoord =  MoveStrategy.GetMove(this, gameState.Walls, gameState);
+        Coordinate = gameState.GameStateExtensions(Coordinate, direction, gameState.Walls);
+        Symbol = GetSymbol(direction);
+    }
 
-        return gameState with
+    private static char GetSymbol(Direction direction)
+    {
+        return direction switch
         {
-            Pac = gameState.Pac with
-            {
-                Coordinate = newCoord,
-                Symbol = _getSymbol(Coordinate, newCoord)
-            }
+            Direction.South => Constants.PacDown,
+            Direction.North => Constants.PacUp,
+            Direction.West => Constants.PacLeft,
+            Direction.East => Constants.PacRight,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
 
-    private char _getSymbol(Coordinate originalCoord, Coordinate newCoord)
-    {
-        var (x1, y1) = originalCoord;
-        var (x2, y2) = newCoord;
-        var coordDisplacement = (x2 - x1, y2 - y1);
-
-        return coordDisplacement switch
-        {
-            (_, > 0) => Constants.PacDown,
-            (_, < 0) => Constants.PacUp,
-            (< 0, _) => Constants.PacLeft,
-            (> 0, _) => Constants.PacRight,
-            _ => throw new ArgumentOutOfRangeException()
-        };
-    }
+    public void ResetSymbol() => Symbol = Constants.PacStart;
 }
