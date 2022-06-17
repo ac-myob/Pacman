@@ -3,6 +3,7 @@ using Pacman.Business.View;
 
 var consoleReader = new ConsoleReader();
 var consoleWriter = new ConsoleWriter();
-var gameEngine = new GameEngine(consoleReader, consoleWriter);
+var gameService = new GameService();
+var application = new Application(consoleReader, consoleWriter, gameService);
 
-gameEngine.Run();
+application.Run();

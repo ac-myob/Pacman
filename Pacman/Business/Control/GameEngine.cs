@@ -1,70 +1,130 @@
+using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.Selector;
+using Pacman.Business.Control.Sequence;
 using Pacman.Business.Model;
-using Pacman.Business.View;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
 public class GameEngine
 {
-    private readonly IWriter _writer;
-    private readonly IReader _reader;
-    private readonly GameService _gameService;
-    private GameState _gameState = null!;
-    private readonly IDictionary<char, Colour> _colourMapping = new Dictionary<char, Colour>
-    {
-        {Constants.Heart, Colour.Red},
-        {Constants.RandomGhost, Colour.Blue},
-        {Constants.GreedyGhost, Colour.Green},
-        {Constants.PathFindingGhost, Colour.Red},
-        {Constants.PacStart, Colour.Yellow},
-        {Constants.PacUp, Colour.Yellow},
-        {Constants.PacDown, Colour.Yellow},
-        {Constants.PacLeft, Colour.Yellow},
-        {Constants.PacRight, Colour.Yellow}
-    };
+    private Pac _pac = default!;
+    private readonly List<Ghost> _ghosts = new();
+    private readonly Dictionary<Coordinate, Pellet> _pellets = new();
+    private readonly Dictionary<Coordinate, Wall> _walls = new();
+    public GameState GameState { get; private set; } = default!;
     
-    public GameEngine(IReader reader, IWriter writer)
+    private readonly GhostFactory _ghostFactory;
+    private readonly ISelector<Coordinate> _selector;
+    private readonly GhostTypeSequence _ghostTypeSequence = new();
+
+    public GameEngine((Size, IEnumerable<Entity>) worldInfo, GhostFactory ghostFactory, ISelector<Coordinate> selector)
     {
-        _reader = reader;
-        _writer = writer;
-        _gameService = new GameService(reader, writer);
+        _ghostFactory = ghostFactory;
+        _selector = selector;
+        InitialiseEntities(worldInfo);
     }
-    
-    public void Run()
+
+    private void InitialiseEntities((Size, IEnumerable<Entity>) worldInfo)
     {
-        _gameState = _gameService.GetNewGameState(Constants.GameFilepath);
-        _displayMap();
-        
-        do
-        {
-            foreach (var movableEntity in _gameState.GetMovableEntities())
-                _gameState = movableEntity.PlayTurn(_gameState);
+        var (size, entities) = worldInfo;
 
-            _gameState = _gameState.UpdatePowerUp().UpdatePellets();
-            _displayMap();
-
-            if (_gameState.IsPacOnGhost())
+        foreach (var entity in entities)
+            switch (entity.Symbol)
             {
-                _writer.Write(Messages.GhostCollision);
-                _reader.ReadKey();
-                _gameState = _gameService.GetResetGameState(_gameState);
-                _displayMap();
-            }
-            else if (!_gameState.Pellets.Any())
-            {
-                _writer.Write(Messages.RoundComplete);
-                _reader.ReadKey();
-                _gameState = _gameService.GetNextRoundGameState(_gameState);
-                _displayMap();
+                case Constants.Wall:
+                    _walls.Add(entity.Coordinate, (Wall) entity);
+                    break;
+                case Constants.Pellet:
+                case Constants.MagicPellet:
+                    _pellets.Add(entity.Coordinate, (Pellet) entity);
+                    break;
+                case Constants.RandomGhost:
+                case Constants.GreedyGhost:
+                case Constants.PathFindingGhost:
+                    _ghosts.Add((Ghost) entity);
+                    break;
+                case Constants.PacStart:
+                    _pac = (Pac) entity;
+                    break;
             }
 
-        } while (!_gameState.IsGameFinished() && _gameState.Lives > 0);
-        
-        _writer.Write(Messages.GetGameOutcome(_gameState));
+        GameState = new GameState(size, Constants.PacStartingLives, Constants.StartRound, 
+            _pac, _ghosts, _walls.Values, _pellets.Values);
     }
     
-    private void _displayMap() {
-        _writer.Clear();
-        _writer.Write(Messages.GetTurnInfo(_gameState) + _gameState.GetString(), _colourMapping);
+    public void Tick(Direction direction)
+    {
+        _pac.PlayTurn(GameState, direction);
+
+        foreach (var ghost in _ghosts) 
+            ghost.PlayTurn(GameState);
+
+        UpdatePowerUp();
+        UpdatePellets();
+        
+        if (IsPacOnGhost()) 
+            ResetRound();
+        else if (!HasPellets()) 
+            IncreaseRound();
+    }
+
+    private void UpdatePowerUp()
+    {
+        _pellets.TryGetValue(_pac.Coordinate, out var pellet);
+
+        if (pellet is {Eaten: false, Symbol: Constants.MagicPellet})
+            GameState.ResetPowerUp();
+        else
+            GameState.DecreasePowerUp();
+    }
+
+    private void UpdatePellets()
+    {
+        if (_pellets.ContainsKey(_pac.Coordinate) && _ghosts.All(g => g.Coordinate != _pac.Coordinate))
+            _pellets[_pac.Coordinate].Eaten = true;
+    } 
+
+    private bool IsPacOnGhost() => GameState.Ghosts.Any(g => g.Coordinate == GameState.Pac.Coordinate);
+    
+    private void ResetRound()
+    {
+        foreach (var movableEntity in GameState.GetMovableEntities())
+            movableEntity.ResetCoordinate();
+        
+        GameState.Pac.ResetSymbol();
+        GameState.DecreaseLife();
+    }
+
+    private bool HasPellets() => GameState.GetPellets().Any();
+
+    private void IncreaseRound()
+    {
+        foreach (var pellet in _pellets.Values)
+            pellet.Eaten = false;
+        
+        foreach (var movableEntity in GameState.GetMovableEntities())
+            movableEntity.ResetCoordinate();
+        
+        GameState.Pac.ResetSymbol();
+        GameState.IncrementRound();
+        
+        var newGhost = _getNewGhost();
+        if (newGhost != null)
+            _ghosts.Add(newGhost);
+    }
+    
+    private Ghost? _getNewGhost()
+    {
+        var newGhostType = _ghostTypeSequence.GetNext();
+        var posNewGhostCoords = _pellets.Keys.Except(_ghosts.Select(g => g.Coordinate)).ToArray();
+
+        // If no space to add ghost, don't add ghost
+        if (!posNewGhostCoords.Any()) return null;
+        
+        var newGhostCoord = _selector.SelectFrom(posNewGhostCoords);
+        var newGhost = _ghostFactory.GetGhost(newGhostType, newGhostCoord);
+
+        return newGhost;
     }
 }

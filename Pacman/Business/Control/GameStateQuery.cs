@@ -6,7 +6,7 @@ namespace Pacman.Business.Control;
 
 public static class GameStateQuery
 {
-    public static Coordinate GetNewCoord(
+    public static Coordinate GameStateExtensions(
         this GameState gameState, Coordinate coordinate, Direction direction, IEnumerable<Entity> obstacles)
     {
         var (x, y) = coordinate;
@@ -27,7 +27,7 @@ public static class GameStateQuery
     {
         var (width, length) = gameState.Size;
         var res = new StringBuilder(new string(Constants.Blank, length * width));
-        var entities = gameState.Pellets.Cast<Entity>().
+        var entities = gameState.GetPellets().Cast<Entity>().
             Concat(gameState.Walls).
             Concat(gameState.GetMovableEntities()).
             OrderBy(o => o.Coordinate.Y).
@@ -43,11 +43,20 @@ public static class GameStateQuery
         return res.ToString();
     }
     
+    public static IEnumerable<Pellet> GetPellets(this GameState gameState) =>
+        gameState.Pellets.Where(p => !p.Eaten);
+    
     public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) => 
         gameState.Ghosts.Cast<MovableEntity>().Prepend(gameState.Pac);
 
-    public static bool IsPacOnGhost(this GameState gameState) => 
-        gameState.Ghosts.Any(g => g.Coordinate == gameState.Pac.Coordinate);
+    public static bool IsDirectionValid(this GameState gameState, Direction direction)
+    {
+        var currentPacCoord = gameState.Pac.Coordinate;
+        var newPacCoord = gameState.GameStateExtensions(currentPacCoord, direction, gameState.Walls);
 
-    public static bool IsGameFinished(this GameState gameState) => gameState.Round > Constants.MaxRounds;
+        return currentPacCoord != newPacCoord;
+    }
+
+    public static bool IsGameFinished(this GameState gameState) => 
+        gameState.Round > Constants.MaxRounds || gameState.Lives == 0;
 }
