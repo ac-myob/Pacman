@@ -37,12 +37,29 @@ public class Application
     public void Run()
     {
         DisplayGame();
-
+        
         do
         {
-            var userInput = GetKeyPress();
-            _gameService.Tick(userInput);
-            DisplayGame();
+            if (_gameService.GameState.IsPacOnGhost())
+            {
+                _writer.Write(Messages.GhostCollision);
+                _reader.ReadKey();
+                _gameService.ResetRound();
+                DisplayGame();
+            }
+            else if (!_gameService.GameState.HasPellets())
+            {
+                _writer.Write(Messages.RoundComplete);
+                _reader.ReadKey();
+                _gameService.IncreaseRound();
+                DisplayGame();
+            }
+            else
+            {
+                var userInput = GetKeyPress();
+                _gameService.PlayRound(userInput);
+                DisplayGame();
+            }
 
         } while(!_gameService.GameState.IsGameFinished());
         

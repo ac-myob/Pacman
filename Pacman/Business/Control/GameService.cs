@@ -18,5 +18,7 @@ public class GameService : IGameService
         _gameEngine = new GameEngine(worldBuilder.Build(), ghostFactory, randomSelector);
     }
     
-    public void Tick(Direction inputDirection) => _gameEngine.Tick(inputDirection);
+    public void PlayRound(Direction inputDirection) => _gameEngine.PlayRound(inputDirection);
+    public void ResetRound() => _gameEngine.ResetRound();
+    public void IncreaseRound() => _gameEngine.IncreaseRound();
 }

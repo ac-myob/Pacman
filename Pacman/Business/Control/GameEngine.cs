@@ -53,7 +53,7 @@ public class GameEngine
             _pac, _ghosts, _walls.Values, _pellets.Values);
     }
     
-    public void Tick(Direction direction)
+    public void PlayRound(Direction direction)
     {
         _pac.PlayTurn(GameState, direction);
 
@@ -62,11 +62,6 @@ public class GameEngine
 
         UpdatePowerUp();
         UpdatePellets();
-        
-        if (IsPacOnGhost()) 
-            ResetRound();
-        else if (!HasPellets()) 
-            IncreaseRound();
     }
 
     private void UpdatePowerUp()
@@ -84,10 +79,8 @@ public class GameEngine
         if (_pellets.ContainsKey(_pac.Coordinate) && _ghosts.All(g => g.Coordinate != _pac.Coordinate))
             _pellets[_pac.Coordinate].Eaten = true;
     } 
-
-    private bool IsPacOnGhost() => GameState.Ghosts.Any(g => g.Coordinate == GameState.Pac.Coordinate);
     
-    private void ResetRound()
+    public void ResetRound()
     {
         foreach (var movableEntity in GameState.GetMovableEntities())
             movableEntity.ResetCoordinate();
@@ -95,10 +88,8 @@ public class GameEngine
         GameState.Pac.ResetSymbol();
         GameState.DecreaseLife();
     }
-
-    private bool HasPellets() => GameState.GetPellets().Any();
-
-    private void IncreaseRound()
+    
+    public void IncreaseRound()
     {
         foreach (var pellet in _pellets.Values)
             pellet.Eaten = false;
@@ -108,23 +99,20 @@ public class GameEngine
         
         GameState.Pac.ResetSymbol();
         GameState.IncrementRound();
-        
-        var newGhost = _getNewGhost();
-        if (newGhost != null)
-            _ghosts.Add(newGhost);
+        AddGhost();
     }
     
-    private Ghost? _getNewGhost()
+    private void AddGhost()
     {
         var newGhostType = _ghostTypeSequence.GetNext();
         var posNewGhostCoords = _pellets.Keys.Except(_ghosts.Select(g => g.Coordinate)).ToArray();
 
         // If no space to add ghost, don't add ghost
-        if (!posNewGhostCoords.Any()) return null;
+        if (!posNewGhostCoords.Any()) return;
         
         var newGhostCoord = _selector.SelectFrom(posNewGhostCoords);
         var newGhost = _ghostFactory.GetGhost(newGhostType, newGhostCoord);
-
-        return newGhost;
+            
+        _ghosts.Add(newGhost);
     }
 }

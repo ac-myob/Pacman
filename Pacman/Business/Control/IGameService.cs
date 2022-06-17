@@ -5,6 +5,8 @@ namespace Pacman.Business.Control;
 
 public interface IGameService
 {
-    public void Tick(Direction inputDirection);
+    public void PlayRound(Direction inputDirection);
+    public void ResetRound();
+    public void IncreaseRound();
     public GameState GameState { get; }
 }

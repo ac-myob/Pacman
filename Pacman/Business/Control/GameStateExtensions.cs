@@ -46,6 +46,8 @@ public static class GameStateExtensions
     public static IEnumerable<Pellet> GetPellets(this GameState gameState) =>
         gameState.Pellets.Where(p => !p.Eaten);
     
+    public static bool HasPellets(this GameState gameState) => gameState.GetPellets().Any();
+    
     public static IEnumerable<MovableEntity> GetMovableEntities(this GameState gameState) => 
         gameState.Ghosts.Cast<MovableEntity>().Prepend(gameState.Pac);
 
@@ -59,4 +61,7 @@ public static class GameStateExtensions
 
     public static bool IsGameFinished(this GameState gameState) => 
         gameState.Round > Constants.MaxRounds || gameState.Lives == 0;
+    
+    public static bool IsPacOnGhost(this GameState gameState) =>
+        gameState.Ghosts.Any(g => g.Coordinate == gameState.Pac.Coordinate);
 }

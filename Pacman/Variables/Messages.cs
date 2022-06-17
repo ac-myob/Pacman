@@ -8,6 +8,8 @@ public static class Messages
 {
     public const string InvalidKeyPress = "Invalid key press. Use arrow keys to move:\n";
     public const string WallObstruction = "Pacman cannot move into a wall. Please try again:\n";
+    public const string GhostCollision = "\nYou collided with a ghost! Press any key to continue...";
+    public const string RoundComplete = "\nRound complete! Press any key to continue...";
 
     public static string GetTurnInfo(GameState gameState)
     {
