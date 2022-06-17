@@ -13,8 +13,8 @@ public class GhostFactory
     {
         _selector = selector;
     }
-    
-    public Ghost GetGhost(GhostType ghostType, Coordinate coordinate, int id)
+
+    public Ghost GetGhost(GhostType ghostType, Coordinate coordinate)
     {
         IMoveStrategy moveStrategy;
         char symbol;
@@ -37,6 +37,6 @@ public class GhostFactory
                 throw new ArgumentOutOfRangeException(nameof(ghostType), ghostType, null);
         }
 
-        return new Ghost(coordinate, symbol, id, moveStrategy);
+        return new Ghost(coordinate, symbol, moveStrategy);
     }
 }
