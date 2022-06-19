@@ -20,7 +20,8 @@ public enum Colour
     Red,
     Blue,
     Yellow,
-    Green
+    Green,
+    Cyan
 }
 
 public enum GameStatus

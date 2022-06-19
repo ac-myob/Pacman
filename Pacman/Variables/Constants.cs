@@ -13,6 +13,7 @@ public static class Constants
     public const char GreedyGhost = 'ᗣ';
     public const char RandomGhost = 'ᓆ';
     public const char PathFindingGhost = 'ᔬ';
+    public const char FleeGhost = 'ᐵ';
     public const char PacStart = '◯';
     public const char Heart = '♥';
     public const char Blank = ' ';

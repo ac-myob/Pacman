@@ -14,6 +14,7 @@ public class Application
         {Constants.RandomGhost, Colour.Blue},
         {Constants.GreedyGhost, Colour.Green},
         {Constants.PathFindingGhost, Colour.Red},
+        {Constants.FleeGhost, Colour.Cyan},
         {Constants.PacStart, Colour.Yellow},
         {Constants.PacUp, Colour.Yellow},
         {Constants.PacDown, Colour.Yellow},
