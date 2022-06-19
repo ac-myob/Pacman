@@ -19,7 +19,9 @@ public class Application
         {Constants.PacUp, Colour.Yellow},
         {Constants.PacDown, Colour.Yellow},
         {Constants.PacLeft, Colour.Yellow},
-        {Constants.PacRight, Colour.Yellow}
+        {Constants.PacRight, Colour.Yellow},
+        {Constants.PacHorz, Colour.Yellow},
+        {Constants.PacVert, Colour.Yellow}
     };
     private readonly IDictionary<char, Colour> _turnInfoColours = new Dictionary<char, Colour>
     {

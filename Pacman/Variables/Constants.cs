@@ -22,6 +22,8 @@ public static class Constants
     public const char PacDown = '^';
     public const char PacLeft = '>';
     public const char PacRight = '<';
+    public const char PacVert = '|';
+    public const char PacHorz = '—';
     public const int PacStartingLives = 6;
     public const int StartRound = 1;
     public const int MaxRounds = 4;

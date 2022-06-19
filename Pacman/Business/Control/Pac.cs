@@ -8,6 +8,7 @@ public class Pac : IMovable, IResetable
     private readonly Coordinate _startCoord;
     private readonly char _startSymbol;
     private Direction _chosenDirection;
+    private bool _isEating;
 
     public Coordinate Coordinate { get; private set; }
     public char Symbol { get; private set; }
@@ -30,16 +31,17 @@ public class Pac : IMovable, IResetable
 
         Coordinate = newCoord;
         Symbol = GetSymbol(_chosenDirection);
+        _isEating = !_isEating;
     }
 
-    private static char GetSymbol(Direction direction)
+    private char GetSymbol(Direction direction)
     {
         return direction switch
         {
-            Direction.South => Constants.PacDown,
-            Direction.North => Constants.PacUp,
-            Direction.West => Constants.PacLeft,
-            Direction.East => Constants.PacRight,
+            Direction.South => _isEating ? Constants.PacVert : Constants.PacDown,
+            Direction.North => _isEating ? Constants.PacVert : Constants.PacUp,
+            Direction.West => _isEating ? Constants.PacHorz : Constants.PacLeft,
+            Direction.East => _isEating ? Constants.PacHorz : Constants.PacRight,
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
