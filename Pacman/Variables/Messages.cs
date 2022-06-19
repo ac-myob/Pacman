@@ -14,12 +14,12 @@ public static class Messages
     public static string GetTurnInfo(GameState gameState)
     {
         var res = new StringBuilder();
-        res.Append($"Lives: {new string(Constants.Heart, gameState.Lives)}\n");
+        res.Append($"Lives: {new string(Constants.Heart, gameState.Pac.Lives)}\n");
         res.Append($"Round: {Math.Min(gameState.Round, Constants.MaxRounds)}/{Constants.MaxRounds}\n");
         res.Append($"Pellets remaining: {gameState.GetPellets().Count()}\n");
 
-        if (gameState.PowerUpRemaining > 0)
-            res.Append($"Power up timer: {gameState.PowerUpRemaining}\n");
+        if (gameState.Pac.PowerUp > 0)
+            res.Append($"Power up timer: {gameState.Pac.PowerUp}\n");
 
         return res.ToString();
     }

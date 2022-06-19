@@ -19,7 +19,8 @@ public class WorldBuilder
     {
         var width = _world.GetLength(1);
         var length = _world.GetLength(0);
-        var pac = new Pac(GetPacCoord(_world, width, length), Constants.PacStart);
+        var pac = new Pac(GetPacCoord(_world, width, length), 
+            Constants.PacStart, Constants.PacStartingLives);
         var worldEntities = new List<IEntity>{pac};
 
         for (var l = 0; l < length; l++)

@@ -54,18 +54,20 @@ public class GameEngine
             }
         }
 
-        GameState = new GameState(new Size(width, length), Constants.PacStartingLives, Constants.StartRound, 
-            0, GameStatus.Running, _pac, _ghosts, _walls, _pellets.Values);
+        GameState = new GameState(new Size(width, length), Constants.StartRound, 
+            GameStatus.Running, _pac, _ghosts, _walls, _pellets.Values);
     }
     
     public void PlayRound(Direction direction)
     {
         _pac.SetInput(direction);
-
-        foreach (var movableEntity in _ghosts.Cast<IMovable>().Prepend(_pac)) 
-            movableEntity.Move(GameState);
-
+        _pac.Move(GameState);
+        
         UpdatePowerUp();
+        
+        foreach (var ghost in _ghosts) 
+            ghost.Move(GameState);
+        
         UpdatePellets();
 
         if (_ghosts.Any(g => g.Coordinate == _pac.Coordinate))
@@ -78,10 +80,12 @@ public class GameEngine
     {
         _pellets.TryGetValue(_pac.Coordinate, out var pellet);
 
-        var powerUpRemaining = pellet is {Eaten: false, Symbol: Constants.MagicPellet} && !IsPacOnGhost() ? 
-            Constants.PowerUpTurns : Math.Max(0, GameState.PowerUpRemaining - 1);
-
-        GameState = GameState with {PowerUpRemaining = powerUpRemaining};
+        var pacIsPowered = pellet is {Eaten: false, Symbol: Constants.MagicPellet} && !IsPacOnGhost();
+        
+        if (pacIsPowered) 
+            _pac.AddPowerUp();
+        else
+            _pac.ReducePowerUp();
     }
 
     private void UpdatePellets()
@@ -94,20 +98,19 @@ public class GameEngine
     
     public void ResetRound()
     {
-        foreach (var resetable in _ghosts.Cast<IResetable>().Append(_pac))
+        foreach (var resetable in _ghosts.Append<IResetable>(_pac))
             resetable.ResetState();
         
-        var newLives = GameState.Lives - 1;
+        _pac.ReduceLife();
         GameState = GameState with
         {
-            Lives = newLives,
-            GameStatus = newLives == 0 ? GameStatus.GameComplete : GameStatus.Running
+            GameStatus = _pac.Lives == 0 ? GameStatus.GameComplete : GameStatus.Running
         };
     }
     
     public void IncreaseRound()
     {
-        foreach (var resetable in _ghosts.Cast<IResetable>().Concat(_pellets.Values).Append(_pac))
+        foreach (var resetable in _ghosts.Concat<IResetable>(_pellets.Values).Append(_pac))
             resetable.ResetState();
         
         AddGhost();

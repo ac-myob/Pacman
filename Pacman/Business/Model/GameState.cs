@@ -5,9 +5,7 @@ using Pacman.Variables;
 namespace Pacman.Business.Model;
 
 public record GameState(Size Size,
-    int Lives,
     int Round,
-    int PowerUpRemaining,
     GameStatus GameStatus,
     Pac Pac,
     IEnumerable<Ghost> Ghosts,

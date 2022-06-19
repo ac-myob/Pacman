@@ -12,13 +12,17 @@ public class Pac : IMovable, IResetable
 
     public Coordinate Coordinate { get; private set; }
     public char Symbol { get; private set; }
+    public int Lives { get; private set; }
 
-    public Pac(Coordinate coordinate, char symbol)
+    public int PowerUp { get; private set; }
+
+    public Pac(Coordinate coordinate, char symbol, int lives)
     {
         _startCoord = coordinate;
         Coordinate = coordinate;
         _startSymbol = symbol;
         Symbol = symbol;
+        Lives = lives;
     }
 
     public void SetInput(Direction direction) => _chosenDirection = direction;
@@ -51,4 +55,10 @@ public class Pac : IMovable, IResetable
         Coordinate = _startCoord;
         Symbol = _startSymbol;
     }
+
+    public void ReduceLife() => Lives = Math.Max(0, Lives - 1);
+
+    public void AddPowerUp() => PowerUp = Constants.PowerUpTurns;
+
+    public void ReducePowerUp() => PowerUp = Math.Max(0, PowerUp - 1);
 }

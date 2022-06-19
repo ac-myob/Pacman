@@ -15,7 +15,7 @@ public class Ghost : IMovable, IResetable
     
     public void Move(GameState gameState)
     {
-        var isFeared = gameState.PowerUpRemaining > 0;
+        var isFeared = gameState.Pac.PowerUp > 0;
         var currentStrategy = isFeared ? _fleeStrategy : _moveStrategy;
         bool IsBlocked(Coordinate coordinate) => 
             gameState.Walls.ContainsKey(coordinate) || gameState.Ghosts.Any(g => g.Coordinate == coordinate);

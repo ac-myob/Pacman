@@ -21,7 +21,7 @@ public static class CoordinateExtensions
     public static Coordinate Shift(this Coordinate coordinate, Direction direction, Size size)
     {
         var (width, length) = size;
-        var newCoord = direction switch
+        return direction switch
         {
             Direction.North => coordinate with {Y = Utilities.Mod(coordinate.Y - 1, length)},
             Direction.South => coordinate with {Y = Utilities.Mod(coordinate.Y + 1, length)},
@@ -29,7 +29,5 @@ public static class CoordinateExtensions
             Direction.West => coordinate with {X = Utilities.Mod(coordinate.X - 1, width)},
             _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
-
-        return newCoord;
     }
 }
