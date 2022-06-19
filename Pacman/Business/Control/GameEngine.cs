@@ -18,14 +18,14 @@ public class GameEngine
     private readonly ISelector<Coordinate> _selector;
     private readonly GhostTypeSequence _ghostTypeSequence = new();
 
-    public GameEngine(IEnumerable<Entity> entities, GhostFactory ghostFactory, ISelector<Coordinate> selector)
+    public GameEngine(IEnumerable<IEntity> entities, GhostFactory ghostFactory, ISelector<Coordinate> selector)
     {
         _ghostFactory = ghostFactory;
         _selector = selector;
         InitialiseEntities(entities);
     }
 
-    private void InitialiseEntities(IEnumerable<Entity> entities)
+    private void InitialiseEntities(IEnumerable<IEntity> entities)
     {
         int length = 0, width = 0;
         
@@ -55,56 +55,67 @@ public class GameEngine
         }
 
         GameState = new GameState(new Size(width, length), Constants.PacStartingLives, Constants.StartRound, 
-            _pac, _ghosts, _walls.Values, _pellets.Values);
+            0, GameStatus.Running, _pac, _ghosts, _walls, _pellets.Values);
     }
     
     public void PlayRound(Direction direction)
     {
-        _pac.PlayTurn(GameState, direction);
+        _pac.SetInput(direction);
 
-        foreach (var ghost in _ghosts) 
-            ghost.PlayTurn(GameState);
+        foreach (var movableEntity in _ghosts.Cast<IMovable>().Prepend(_pac)) 
+            movableEntity.Move(GameState);
 
         UpdatePowerUp();
         UpdatePellets();
+
+        if (_ghosts.Any(g => g.Coordinate == _pac.Coordinate))
+            GameState = GameState with {GameStatus = GameStatus.Collided};
+        else if (!GameState.GetPellets().Any())
+            GameState = GameState with {GameStatus = GameStatus.RoundComplete};
     }
 
     private void UpdatePowerUp()
     {
         _pellets.TryGetValue(_pac.Coordinate, out var pellet);
 
-        if (pellet is {Eaten: false, Symbol: Constants.MagicPellet})
-            GameState.ResetPowerUp();
-        else
-            GameState.DecreasePowerUp();
+        var powerUpRemaining = pellet is {Eaten: false, Symbol: Constants.MagicPellet} && !IsPacOnGhost() ? 
+            Constants.PowerUpTurns : Math.Max(0, GameState.PowerUpRemaining - 1);
+
+        GameState = GameState with {PowerUpRemaining = powerUpRemaining};
     }
 
     private void UpdatePellets()
     {
-        if (_pellets.ContainsKey(_pac.Coordinate) && _ghosts.All(g => g.Coordinate != _pac.Coordinate))
+        if (_pellets.ContainsKey(_pac.Coordinate) && !IsPacOnGhost())
             _pellets[_pac.Coordinate].Eaten = true;
-    } 
+    }
+
+    private bool IsPacOnGhost() => _ghosts.Any(g => g.Coordinate == _pac.Coordinate);
     
     public void ResetRound()
     {
-        foreach (var movableEntity in GameState.GetMovableEntities())
-            movableEntity.ResetCoordinate();
+        foreach (var resetable in _ghosts.Cast<IResetable>().Append(_pac))
+            resetable.ResetState();
         
-        GameState.Pac.ResetSymbol();
-        GameState.DecreaseLife();
+        var newLives = GameState.Lives - 1;
+        GameState = GameState with
+        {
+            Lives = newLives,
+            GameStatus = newLives == 0 ? GameStatus.GameComplete : GameStatus.Running
+        };
     }
     
     public void IncreaseRound()
     {
-        foreach (var pellet in _pellets.Values)
-            pellet.Eaten = false;
+        foreach (var resetable in _ghosts.Cast<IResetable>().Concat(_pellets.Values).Append(_pac))
+            resetable.ResetState();
         
-        foreach (var movableEntity in GameState.GetMovableEntities())
-            movableEntity.ResetCoordinate();
-        
-        GameState.Pac.ResetSymbol();
-        GameState.IncrementRound();
         AddGhost();
+        GameState = GameState with
+        {
+            Round = GameState.Round + 1,
+            GameStatus = GameState.Round > Constants.MaxRounds ? GameStatus.GameComplete : GameStatus.Running
+        };
     }
     
     private void AddGhost()

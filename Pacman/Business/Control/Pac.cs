@@ -3,14 +3,33 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public class Pac : MovableEntity
+public class Pac : IMovable, IResetable
 {
-    public Pac(Coordinate coordinate, char symbol) : base(coordinate, symbol) { }
-    
-    public void PlayTurn(GameState gameState, Direction direction)
+    private readonly Coordinate _startCoord;
+    private readonly char _startSymbol;
+    private Direction _chosenDirection;
+
+    public Coordinate Coordinate { get; private set; }
+    public char Symbol { get; private set; }
+
+    public Pac(Coordinate coordinate, char symbol)
     {
-        Coordinate = gameState.GetNewCoord(Coordinate, direction, gameState.Walls);
-        Symbol = GetSymbol(direction);
+        _startCoord = coordinate;
+        Coordinate = coordinate;
+        _startSymbol = symbol;
+        Symbol = symbol;
+    }
+
+    public void SetInput(Direction direction) => _chosenDirection = direction;
+
+    public void Move(GameState gameState)
+    {
+        var newCoord = Coordinate.Shift(_chosenDirection, gameState.Size);
+
+        if (gameState.Walls.ContainsKey(newCoord)) return;
+
+        Coordinate = newCoord;
+        Symbol = GetSymbol(_chosenDirection);
     }
 
     private static char GetSymbol(Direction direction)
@@ -25,5 +44,9 @@ public class Pac : MovableEntity
         };
     }
 
-    public void ResetSymbol() => Symbol = Constants.PacStart;
+    public void ResetState()
+    {
+        Coordinate = _startCoord;
+        Symbol = _startSymbol;
+    }
 }

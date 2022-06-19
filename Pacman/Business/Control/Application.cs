@@ -1,4 +1,3 @@
-using Pacman.Business.Model;
 using Pacman.Business.View;
 using Pacman.Variables;
 
@@ -40,28 +39,33 @@ public class Application
         
         do
         {
-            if (_gameService.GameState.IsPacOnGhost())
+            switch (_gameService.GameState.GameStatus)
             {
-                _writer.Write(Messages.GhostCollision);
-                _reader.ReadKey();
-                _gameService.ResetRound();
-                DisplayGame();
+                case GameStatus.Collided:
+                    _writer.Write(Messages.GhostCollision);
+                    _reader.ReadKey();
+                    _gameService.ResetRound();
+                    DisplayGame();
+                    break;
+                case GameStatus.RoundComplete:
+                    _writer.Write(Messages.RoundComplete);
+                    _reader.ReadKey();
+                    _gameService.IncreaseRound();
+                    DisplayGame();
+                    break;
+                case  GameStatus.Running:
+                {
+                    var userInput = GetKeyPress();
+                    _gameService.PlayRound(userInput);
+                    DisplayGame();
+                    break;
+                }
+                case GameStatus.GameComplete:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
-            else if (!_gameService.GameState.HasPellets())
-            {
-                _writer.Write(Messages.RoundComplete);
-                _reader.ReadKey();
-                _gameService.IncreaseRound();
-                DisplayGame();
-            }
-            else
-            {
-                var userInput = GetKeyPress();
-                _gameService.PlayRound(userInput);
-                DisplayGame();
-            }
-
-        } while(!_gameService.GameState.IsGameFinished());
+        } while(_gameService.GameState.GameStatus != GameStatus.GameComplete);
         
         _writer.Write(Messages.GetGameOutcome(_gameService.GameState));
     }

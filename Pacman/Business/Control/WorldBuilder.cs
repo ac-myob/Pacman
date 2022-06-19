@@ -15,18 +15,18 @@ public class WorldBuilder
         _ghostFactory = ghostFactory;
     }
 
-    public IEnumerable<Entity> GetEntities()
+    public IEnumerable<IEntity> GetEntities()
     {
         var width = _world.GetLength(1);
         var length = _world.GetLength(0);
         var pac = new Pac(GetPacCoord(_world, width, length), Constants.PacStart);
-        var worldEntities = new List<Entity>{pac};
+        var worldEntities = new List<IEntity>{pac};
 
         for (var l = 0; l < length; l++)
             for (var w = 0; w < width; w++)
             {
                 var currentCoord = new Coordinate(w, l);
-                Entity? currentEntity = _world[l, w] switch
+                IEntity? currentEntity = _world[l, w] switch
                 {
                     Constants.Wall => new Wall(currentCoord),
                     Constants.Pellet => new Pellet(currentCoord, Constants.Pellet),

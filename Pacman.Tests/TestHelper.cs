@@ -1,8 +1,8 @@
 using System;
+using System.Collections.Generic;
 using Moq;
 using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
-using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
@@ -16,9 +16,11 @@ public static class TestHelper
             It.IsAny<Size>(),
             Constants.PacStartingLives,
             Constants.StartRound,
+            It.IsAny<int>(),
+            It.IsAny<GameStatus>(),
             It.IsAny<Pac>(),
             Array.Empty<Ghost>(),
-            Array.Empty<Wall>(),
+            new Dictionary<Coordinate, Wall>(),
             Array.Empty<Pellet>());
     }
 }

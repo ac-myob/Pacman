@@ -22,3 +22,11 @@ public enum Colour
     Yellow,
     Green
 }
+
+public enum GameStatus
+{
+    Running,
+    RoundComplete,
+    Collided,
+    GameComplete
+}

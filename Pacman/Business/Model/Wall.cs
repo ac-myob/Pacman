@@ -2,9 +2,14 @@ using Pacman.Variables;
 
 namespace Pacman.Business.Model;
 
-public class Wall : Entity
+public class Wall : IEntity 
 {
-    public Wall(Coordinate coordinate) : base(coordinate, Constants.Wall)
+    public Coordinate Coordinate { get; }
+    public char Symbol { get; }
+
+    public Wall(Coordinate coordinate, char symbol = Constants.Wall)
     {
+        Coordinate = coordinate;
+        Symbol = symbol;
     }
 }
