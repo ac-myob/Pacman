@@ -5,14 +5,12 @@ namespace Pacman.Business.Control.MoveStrategies;
 
 public class PathFindingMoveStrategy : IMoveStrategy
 {
-    public Coordinate GetMove(MovableEntity movableEntity, IEnumerable<Entity> obstacles, GameState gameState)
+    public Coordinate GetMove(Coordinate startingCoord, Func<Coordinate, bool> isBlocked, GameState gameState)
     {
-        var coordinate = movableEntity.Coordinate;
-        if (gameState.Pac.Coordinate == coordinate) return coordinate;
+        if (gameState.Pac.Coordinate == startingCoord) return startingCoord;
         
         var possiblePaths = new Queue<Coordinate[]>();
         possiblePaths.Enqueue(Array.Empty<Coordinate>());
-        var obstaclesArr = obstacles.ToArray();
         Coordinate[] dequeuedCoords;
         Coordinate lastDequeuedCoord;
         var visitedCoords = new HashSet<Coordinate>();
@@ -23,24 +21,24 @@ public class PathFindingMoveStrategy : IMoveStrategy
             try
             {
                 dequeuedCoords = possiblePaths.Dequeue().ToArray();
-                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : coordinate;
+                lastDequeuedCoord = dequeuedCoords.Any() ? dequeuedCoords.Last() : startingCoord;
             }
             catch (InvalidOperationException)
             {
-                return coordinate;
+                return startingCoord;
             }
 
             foreach (Direction direction in Enum.GetValues(typeof(Direction)))
             {
-                var currCoord = gameState.GetNewCoord(lastDequeuedCoord, direction, obstaclesArr);
-                
-                if (currCoord == lastDequeuedCoord || visitedCoords.Contains(currCoord)) continue;
+                var currentCoord = lastDequeuedCoord.Shift(direction, gameState.Size);
 
-                visitedCoords.Add(currCoord);
+                if (isBlocked(currentCoord) || visitedCoords.Contains(currentCoord)) continue;
+
+                visitedCoords.Add(currentCoord);
                 
                 possiblePaths.Enqueue(dequeuedCoords.Length < 2
-                    ? dequeuedCoords.Append(currCoord).ToArray()
-                    : new[] {dequeuedCoords.First(), currCoord});
+                    ? dequeuedCoords.Append(currentCoord).ToArray()
+                    : new[] {dequeuedCoords.First(), currentCoord});
             }
 
         } while (lastDequeuedCoord != gameState.Pac.Coordinate);

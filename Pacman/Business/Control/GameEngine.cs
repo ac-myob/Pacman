@@ -1,70 +1,137 @@
+using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.Selector;
+using Pacman.Business.Control.Sequence;
 using Pacman.Business.Model;
-using Pacman.Business.View;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
 public class GameEngine
 {
-    private readonly IWriter _writer;
-    private readonly IReader _reader;
-    private readonly GameService _gameService;
-    private GameState _gameState = null!;
-    private readonly IDictionary<char, Colour> _colourMapping = new Dictionary<char, Colour>
-    {
-        {Constants.Heart, Colour.Red},
-        {Constants.RandomGhost, Colour.Blue},
-        {Constants.GreedyGhost, Colour.Green},
-        {Constants.PathFindingGhost, Colour.Red},
-        {Constants.PacStart, Colour.Yellow},
-        {Constants.PacUp, Colour.Yellow},
-        {Constants.PacDown, Colour.Yellow},
-        {Constants.PacLeft, Colour.Yellow},
-        {Constants.PacRight, Colour.Yellow}
-    };
+    private Pac _pac = default!;
+    private readonly List<Ghost> _ghosts = new();
+    private readonly Dictionary<Coordinate, Pellet> _pellets = new();
+    private readonly Dictionary<Coordinate, Wall> _walls = new();
+    public GameState GameState { get; private set; } = default!;
     
-    public GameEngine(IReader reader, IWriter writer)
+    private readonly GhostFactory _ghostFactory;
+    private readonly ISelector<Coordinate> _selector;
+    private readonly GhostTypeSequence _ghostTypeSequence = new();
+
+    public GameEngine(IEnumerable<IEntity> entities, GhostFactory ghostFactory, ISelector<Coordinate> selector)
     {
-        _reader = reader;
-        _writer = writer;
-        _gameService = new GameService(reader, writer);
+        _ghostFactory = ghostFactory;
+        _selector = selector;
+        InitialiseEntities(entities);
     }
-    
-    public void Run()
+
+    private void InitialiseEntities(IEnumerable<IEntity> entities)
     {
-        _gameState = _gameService.GetNewGameState(Constants.GameFilepath);
-        _displayMap();
+        int length = 0, width = 0;
         
-        do
+        foreach (var entity in entities)
         {
-            foreach (var movableEntity in _gameState.GetMovableEntities())
-                _gameState = movableEntity.PlayTurn(_gameState);
-
-            _gameState = _gameState.UpdatePowerUp().UpdatePellets();
-            _displayMap();
-
-            if (_gameState.IsPacOnGhost())
+            length = Math.Max(length, entity.Coordinate.Y + 1);
+            width = Math.Max(width, entity.Coordinate.X + 1);
+            
+            switch (entity.Symbol)
             {
-                _writer.Write(Messages.GhostCollision);
-                _reader.ReadKey();
-                _gameState = _gameService.GetResetGameState(_gameState);
-                _displayMap();
+                case Constants.Wall:
+                    _walls.Add(entity.Coordinate, (Wall) entity);
+                    break;
+                case Constants.Pellet:
+                case Constants.MagicPellet:
+                    _pellets.Add(entity.Coordinate, (Pellet) entity);
+                    break;
+                case Constants.RandomGhost:
+                case Constants.GreedyGhost:
+                case Constants.PathFindingGhost:
+                    _ghosts.Add((Ghost) entity);
+                    break;
+                case Constants.PacStart:
+                    _pac = (Pac) entity;
+                    break;
             }
-            else if (!_gameState.Pellets.Any())
-            {
-                _writer.Write(Messages.RoundComplete);
-                _reader.ReadKey();
-                _gameState = _gameService.GetNextRoundGameState(_gameState);
-                _displayMap();
-            }
+        }
 
-        } while (!_gameState.IsGameFinished() && _gameState.Lives > 0);
-        
-        _writer.Write(Messages.GetGameOutcome(_gameState));
+        GameState = new GameState(new Size(width, length), Constants.StartRound, 
+            GameStatus.Running, _pac, _ghosts, _walls, _pellets.Values);
     }
     
-    private void _displayMap() {
-        _writer.Clear();
-        _writer.Write(Messages.GetTurnInfo(_gameState) + _gameState.GetString(), _colourMapping);
+    public void PlayRound(Direction direction)
+    {
+        _pac.SetInput(direction);
+        _pac.Move(GameState);
+        
+        UpdatePowerUp();
+        
+        foreach (var ghost in _ghosts) 
+            ghost.Move(GameState);
+        
+        UpdatePellets();
+
+        if (_ghosts.Any(g => g.Coordinate == _pac.Coordinate))
+            GameState = GameState with {GameStatus = GameStatus.Collided};
+        else if (!GameState.GetPellets().Any())
+            GameState = GameState with {GameStatus = GameStatus.RoundComplete};
+    }
+
+    private void UpdatePowerUp()
+    {
+        _pellets.TryGetValue(_pac.Coordinate, out var pellet);
+
+        var pacIsPowered = pellet is {Eaten: false, Symbol: Constants.MagicPellet} && !IsPacOnGhost();
+        
+        if (pacIsPowered) 
+            _pac.AddPowerUp();
+        else
+            _pac.ReducePowerUp();
+    }
+
+    private void UpdatePellets()
+    {
+        if (_pellets.ContainsKey(_pac.Coordinate) && !IsPacOnGhost())
+            _pellets[_pac.Coordinate].Eaten = true;
+    }
+
+    private bool IsPacOnGhost() => _ghosts.Any(g => g.Coordinate == _pac.Coordinate);
+    
+    public void ResetRound()
+    {
+        foreach (var resetable in _ghosts.Append<IResetable>(_pac))
+            resetable.ResetState();
+        
+        _pac.ReduceLife();
+        GameState = GameState with
+        {
+            GameStatus = _pac.Lives == 0 ? GameStatus.GameComplete : GameStatus.Running
+        };
+    }
+    
+    public void IncreaseRound()
+    {
+        foreach (var resetable in _ghosts.Concat<IResetable>(_pellets.Values).Append(_pac))
+            resetable.ResetState();
+        
+        AddGhost();
+        GameState = GameState with
+        {
+            Round = GameState.Round + 1,
+            GameStatus = GameState.Round > Constants.MaxRounds ? GameStatus.GameComplete : GameStatus.Running
+        };
+    }
+    
+    private void AddGhost()
+    {
+        var newGhostType = _ghostTypeSequence.GetNext();
+        var posNewGhostCoords = _pellets.Keys.Except(_ghosts.Select(g => g.Coordinate)).ToArray();
+
+        // If no space to add ghost, don't add ghost
+        if (!posNewGhostCoords.Any()) return;
+        
+        var newGhostCoord = _selector.SelectFrom(posNewGhostCoords);
+        var newGhost = _ghostFactory.GetGhost(newGhostType, newGhostCoord);
+            
+        _ghosts.Add(newGhost);
     }
 }

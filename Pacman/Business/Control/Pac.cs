@@ -1,39 +1,64 @@
-using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;
 
-public record Pac(Coordinate Coordinate, char Symbol, int Id, IMoveStrategy MoveStrategy) :
-    MovableEntity(Coordinate, Symbol, Id, MoveStrategy)
+public class Pac : IMovable, IResetable
 {
-    public override GameState PlayTurn(GameState gameState)
-    {
-        var newCoord =  MoveStrategy.GetMove(this, gameState.Walls, gameState);
+    private readonly Coordinate _startCoord;
+    private readonly char _startSymbol;
+    private Direction _chosenDirection;
+    private bool _isEating;
 
-        return gameState with
+    public Coordinate Coordinate { get; private set; }
+    public char Symbol { get; private set; }
+    public int Lives { get; private set; }
+
+    public int PowerUp { get; private set; }
+
+    public Pac(Coordinate coordinate, char symbol, int lives)
+    {
+        _startCoord = coordinate;
+        Coordinate = coordinate;
+        _startSymbol = symbol;
+        Symbol = symbol;
+        Lives = lives;
+    }
+
+    public void SetInput(Direction direction) => _chosenDirection = direction;
+
+    public void Move(GameState gameState)
+    {
+        var newCoord = Coordinate.Shift(_chosenDirection, gameState.Size);
+
+        if (gameState.Walls.ContainsKey(newCoord)) return;
+
+        Coordinate = newCoord;
+        Symbol = GetSymbol(_chosenDirection);
+        _isEating = !_isEating;
+    }
+
+    private char GetSymbol(Direction direction)
+    {
+        return direction switch
         {
-            Pac = gameState.Pac with
-            {
-                Coordinate = newCoord,
-                Symbol = _getSymbol(Coordinate, newCoord)
-            }
+            Direction.South => _isEating ? Constants.PacVert : Constants.PacDown,
+            Direction.North => _isEating ? Constants.PacVert : Constants.PacUp,
+            Direction.West => _isEating ? Constants.PacHorz : Constants.PacLeft,
+            Direction.East => _isEating ? Constants.PacHorz : Constants.PacRight,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, null)
         };
     }
 
-    private char _getSymbol(Coordinate originalCoord, Coordinate newCoord)
+    public void ResetState()
     {
-        var (x1, y1) = originalCoord;
-        var (x2, y2) = newCoord;
-        var coordDisplacement = (x2 - x1, y2 - y1);
-
-        return coordDisplacement switch
-        {
-            (_, > 0) => Constants.PacDown,
-            (_, < 0) => Constants.PacUp,
-            (< 0, _) => Constants.PacLeft,
-            (> 0, _) => Constants.PacRight,
-            _ => throw new ArgumentOutOfRangeException()
-        };
+        Coordinate = _startCoord;
+        Symbol = _startSymbol;
     }
+
+    public void ReduceLife() => Lives = Math.Max(0, Lives - 1);
+
+    public void AddPowerUp() => PowerUp = Constants.PowerUpTurns;
+
+    public void ReducePowerUp() => PowerUp = Math.Max(0, PowerUp - 1);
 }

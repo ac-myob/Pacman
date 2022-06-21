@@ -1,18 +1,37 @@
 using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
+using Pacman.Variables;
 
 namespace Pacman.Business.Control.Ghosts;
 
-public record Ghost(Coordinate Coordinate, char Symbol, int Id, IMoveStrategy MoveStrategy) :
-    MovableEntity(Coordinate, Symbol, Id, MoveStrategy)
+public class Ghost : IMovable, IResetable
 {
-    public override GameState PlayTurn(GameState gameState)
+    private readonly IMoveStrategy _moveStrategy;
+    private readonly IMoveStrategy _fleeStrategy = new FleeMoveStrategy();
+    private readonly Coordinate _startCoord;
+    private readonly char _startSymbol;
+    public Coordinate Coordinate { get; private set; }
+    public char Symbol { get; private set; }
+
+    public Ghost(Coordinate coordinate, char symbol, IMoveStrategy moveStrategy)
     {
-        var obstacles = gameState.Walls.Cast<Entity>().Concat(gameState.Ghosts).ToArray();
-        var currentStrategy = gameState.PowerUpRemaining > 0 ? new FleeMoveStrategy() : MoveStrategy;
-        var newCoord = currentStrategy.GetMove(this, obstacles, gameState);
-        var newGhosts = gameState.Ghosts.Select(g => g.Id != Id ? g : g with {Coordinate = newCoord});
-        
-        return gameState with {Ghosts = newGhosts};
+        _moveStrategy = moveStrategy;
+        Coordinate = coordinate;
+        _startCoord = coordinate;
+        Symbol = symbol;
+        _startSymbol = symbol;
     }
+    
+    public void Move(GameState gameState)
+    {
+        var isFeared = gameState.Pac.PowerUp > 0;
+        var currentStrategy = isFeared ? _fleeStrategy : _moveStrategy;
+        bool IsBlocked(Coordinate coordinate) => 
+            gameState.Walls.ContainsKey(coordinate) || gameState.Ghosts.Any(g => g.Coordinate == coordinate);
+        
+        Coordinate = currentStrategy.GetMove(Coordinate, IsBlocked, gameState);
+        Symbol = isFeared ? Constants.FleeGhost : _startSymbol;
+    }
+    
+    public void ResetState() => Coordinate = _startCoord;
 }

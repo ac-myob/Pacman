@@ -13,6 +13,7 @@ public static class Constants
     public const char GreedyGhost = 'ᗣ';
     public const char RandomGhost = 'ᓆ';
     public const char PathFindingGhost = 'ᔬ';
+    public const char FleeGhost = 'ᐵ';
     public const char PacStart = '◯';
     public const char Heart = '♥';
     public const char Blank = ' ';
@@ -21,6 +22,8 @@ public static class Constants
     public const char PacDown = '^';
     public const char PacLeft = '>';
     public const char PacRight = '<';
+    public const char PacVert = '|';
+    public const char PacHorz = '—';
     public const int PacStartingLives = 6;
     public const int StartRound = 1;
     public const int MaxRounds = 4;

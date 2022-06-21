@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using Moq;
+using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
@@ -13,54 +15,54 @@ public class GreedyGhostTests
     
     [Theory]
     [MemberData(nameof(NoObstaclesTestData))]
-    public void PlayTurn_MovesGhostToMinimallyDistantPositionFromPac_GivenNoObstacles(
+    public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenNoObstacles(
         Size mapSize, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, Id = 0},
-            Ghosts = new[] {TestHelper.GetGhost() with {Coordinate = ghostCoord, Id = 1, MoveStrategy = _moveStrategy}}
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)}
         };
 
-        var actualGameState = gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
-        Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
+        Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
     [MemberData(nameof(WallsTestData))]
-    public void PlayTurn_MovesGhostToMinimallyDistantPositionFromPac_GivenWalls(
+    public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenWalls(
         Size mapSize, IEnumerable<Wall> walls, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, Id = 0},
-            Ghosts = new[] {TestHelper.GetGhost() with {Coordinate = ghostCoord, MoveStrategy = new GreedyMoveStrategy(), Id = 1}},
-            Walls = walls
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), new GreedyMoveStrategy())},
+            Walls = walls.ToDictionary(k => k.Coordinate, v => v)
         };
         
-        var actualGameState = gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
-        Assert.Equal(expectedCoord, actualGameState.Ghosts.Single().Coordinate);
+        Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
     [MemberData(nameof(GhostsTestData))]
-    public void PlayTurn_MovesGhostToMinimallyDistantPositionFromPac_GivenOtherGhosts(
+    public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenOtherGhosts(
         Size mapSize, IList<Ghost> ghosts, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = TestHelper.GetPac() with {Coordinate = pacCoord, Id = 0},
-            Ghosts = new[] {TestHelper.GetGhost() with {Coordinate = ghostCoord, MoveStrategy = new GreedyMoveStrategy(), Id = 1}}.Concat(ghosts)
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
+            Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), new GreedyMoveStrategy())}.Concat(ghosts)
         };
         
-        var actualGameState = gameState.Ghosts.First().PlayTurn(gameState);
+        gameState.Ghosts.First().Move(gameState);
         
-        Assert.Equal(expectedCoord, actualGameState.Ghosts.First().Coordinate);
+        Assert.Equal(expectedCoord, gameState.Ghosts.First().Coordinate);
     }
 
     private static IEnumerable<object[]> NoObstaclesTestData()
@@ -116,7 +118,7 @@ public class GreedyGhostTests
         yield return new object[]
         {
             new Size(4, 4),
-            new[] {TestHelper.GetGhost() with {Coordinate = new Coordinate(2, 1)}},
+            new[] {new Ghost(new Coordinate(2, 1), It.IsAny<char>(), It.IsAny<IMoveStrategy>())},
             new Coordinate(1, 1), 
             new Coordinate(3, 1), 
             new Coordinate(1, 1)
@@ -125,7 +127,7 @@ public class GreedyGhostTests
         yield return new object[]
         {
             new Size(4, 4),
-            new[] {TestHelper.GetGhost() with {Coordinate = new Coordinate(1, 2)}},
+            new[] {new Ghost(new Coordinate(1, 2), It.IsAny<char>(), It.IsAny<IMoveStrategy>())},
             new Coordinate(1, 1), 
             new Coordinate(3, 3), 
             new Coordinate(2, 1)
