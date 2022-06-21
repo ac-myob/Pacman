@@ -15,35 +15,35 @@ public class PathFindingGhostTests
     
     [Theory]
     [MemberData(nameof(NoObstaclesTestData))]
-    public void PlayTurn_MovesGhostTowardPac_GivenNoObstacles(
+    public void Move_MovesGhostTowardPac_GivenNoObstacles(
         Size mapSize, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
-            Pac = new Pac(pacCoord, It.IsAny<char>()),
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
             Size = mapSize,
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), new PathFindingMoveStrategy())}
         };
 
-        gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
     [MemberData(nameof(WallsTestData))]
-    public void PlayTurn_MovesGhostTowardPac_GivenWalls(
+    public void Move_MovesGhostTowardPac_GivenWalls(
         Size mapSize, IEnumerable<Wall> walls, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {            
             Size = mapSize,
-            Pac = new Pac(pacCoord, It.IsAny<char>()),
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)},
-            Walls = walls,
+            Walls = walls.ToDictionary(k => k.Coordinate, v => v)
         };
 
-        gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }

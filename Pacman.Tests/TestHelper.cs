@@ -14,9 +14,7 @@ public static class TestHelper
     {
         return new GameState(
             It.IsAny<Size>(),
-            Constants.PacStartingLives,
             Constants.StartRound,
-            It.IsAny<int>(),
             It.IsAny<GameStatus>(),
             It.IsAny<Pac>(),
             Array.Empty<Ghost>(),

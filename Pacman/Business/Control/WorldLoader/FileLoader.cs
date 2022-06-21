@@ -1,7 +1,7 @@
 using Pacman.Exceptions;
 using Pacman.Variables;
 
-namespace Pacman.Business.Control;
+namespace Pacman.Business.Control.WorldLoader;
 
 public class FileLoader : IWorldLoader
 {

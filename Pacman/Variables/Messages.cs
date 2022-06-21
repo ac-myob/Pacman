@@ -23,11 +23,4 @@ public static class Messages
 
         return res.ToString();
     }
-    
-    public static string GetGameOutcome(GameState gameState)
-    {
-        return gameState.Round > Constants.MaxRounds ? 
-            "\nCongratulations! You win!\n" : 
-            "\nYou lost! Better luck next time!\n";
-    }
 }

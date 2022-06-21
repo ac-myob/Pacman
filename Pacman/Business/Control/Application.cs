@@ -9,8 +9,9 @@ public class Application
     private readonly IReader _reader;
     private readonly IWriter _writer;
     private readonly IGameService _gameService;
-    private readonly IDictionary<char, Colour> _entityColours = new Dictionary<char, Colour> 
+    private readonly IDictionary<char, Colour> _colourMapping = new Dictionary<char, Colour> 
     {
+        {Constants.Heart, Colour.Red},
         {Constants.RandomGhost, Colour.Blue},
         {Constants.GreedyGhost, Colour.Green},
         {Constants.PathFindingGhost, Colour.Red},
@@ -22,10 +23,6 @@ public class Application
         {Constants.PacRight, Colour.Yellow},
         {Constants.PacHorz, Colour.Yellow},
         {Constants.PacVert, Colour.Yellow}
-    };
-    private readonly IDictionary<char, Colour> _turnInfoColours = new Dictionary<char, Colour>
-    {
-        {Constants.Heart, Colour.Red}
     };
 
     public Application(IReader reader, IWriter writer, IGameService gameService)
@@ -39,45 +36,37 @@ public class Application
     public void Run()
     {
         DisplayGame();
-        
+
         do
         {
-            switch (_gameService.GameState.GameStatus)
+            if (_gameService.IsPacOnGhost())
             {
-                case GameStatus.Collided:
-                    _writer.Write(Messages.GhostCollision);
-                    _reader.ReadKey();
-                    _gameService.ResetRound();
-                    DisplayGame();
-                    break;
-                case GameStatus.RoundComplete:
-                    _writer.Write(Messages.RoundComplete);
-                    _reader.ReadKey();
-                    _gameService.IncreaseRound();
-                    DisplayGame();
-                    break;
-                case  GameStatus.Running:
-                {
-                    var userInput = GetKeyPress();
-                    _gameService.PlayRound(userInput);
-                    DisplayGame();
-                    break;
-                }
-                case GameStatus.GameComplete:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
+                _writer.Write(Messages.GhostCollision);
+                _reader.ReadKey();
+                _gameService.ResetRound();
+                DisplayGame();
             }
-        } while(_gameService.GameState.GameStatus != GameStatus.GameComplete);
-        
-        _writer.Write(Messages.GetGameOutcome(_gameService.GameState));
+            else if (_gameService.IsRoundComplete())
+            {
+                _writer.Write(Messages.RoundComplete);
+                _reader.ReadKey();
+                _gameService.IncreaseRound();
+                DisplayGame();
+            }
+            else if (_gameService.IsGameRunning())
+            {
+                var userInput = GetKeyPress();
+                _gameService.PlayRound(userInput);
+                DisplayGame();
+            }
+            
+        } while (!_gameService.IsGameFinished());
     }
 
     private void DisplayGame()
     {
         _writer.Clear();
-        _writer.Write(Messages.GetTurnInfo(_gameService.GameState), _turnInfoColours);
-        _writer.Write(_gameService.GameState.GetString(), _entityColours);
+        _writer.Write(_gameService.GameMap(), _colourMapping);
     }
 
     private Direction GetKeyPress()
@@ -98,7 +87,7 @@ public class Application
                 _ => throw new ArgumentOutOfRangeException()
             };
 
-            isDirectionValid = _gameService.GameState.IsDirectionValid(direction);
+            isDirectionValid = _gameService.IsDirectionValid(direction);
 
             if (!isDirectionValid)
                 _writer.Write(Messages.WallObstruction);

@@ -11,32 +11,34 @@ public class PacTests
 {
     [Theory]
     [MemberData(nameof(PrimitiveMoveTestData))]
-    public void PlayTurn_ShouldMoveInRespectiveDirection_WhenKeyIsPressed(
+    public void Move_ShouldMoveInRespectiveDirection_WhenKeyIsPressed(
         Coordinate pacCoord, Direction direction, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = new Pac(pacCoord, It.IsAny<char>())
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>())
         };
 
-        gameState.Pac.PlayTurn(gameState, direction);
+        gameState.Pac.SetInput(direction);
+        gameState.Pac.Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Pac.Coordinate);
     }
 
     [Theory]
     [MemberData(nameof(WrappingTestData))]
-    public void PlayTurn_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
+    public void Move_ShouldWrapCoordinate_WhenKeyIsPressedAndOnEdge(
         Coordinate pacCoord, Size mapSize, Direction direction, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = new Pac(pacCoord, It.IsAny<char>())
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>())
         };
 
-        gameState.Pac.PlayTurn(gameState, direction);
+        gameState.Pac.SetInput(direction);
+        gameState.Pac.Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Pac.Coordinate);
     }
@@ -46,15 +48,16 @@ public class PacTests
     [InlineData(Direction.South, Constants.PacDown)]
     [InlineData(Direction.East, Constants.PacRight)]
     [InlineData(Direction.West, Constants.PacLeft)]
-    public void PlayTurn_ShouldUpdatePacSymbolBasedOnDirection_WhenKeyPressed(Direction direction, char expectedSymbol)
+    public void Move_ShouldUpdatePacSymbolBasedOnDirection_WhenKeyPressed(Direction direction, char expectedSymbol)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 4),
-            Pac = new Pac(new Coordinate(1, 1), It.IsAny<char>())
+            Pac = new Pac(new Coordinate(1, 1), It.IsAny<char>(), It.IsAny<int>())
         };
 
-        gameState.Pac.PlayTurn(gameState, direction);
+        gameState.Pac.SetInput(direction);
+        gameState.Pac.Move(gameState);
 
         Assert.Equal(expectedSymbol, gameState.Pac.Symbol);
     }

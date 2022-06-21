@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Moq;
 using Pacman.Business.Control;
 using Pacman.Business.Control.Ghosts;
@@ -9,7 +10,7 @@ using Xunit;
 
 namespace Pacman.Tests;
 
-public class GameStateQueryTests
+public class GameStateExtensionsTests
 {
     [Fact]
     public void GetString_ReturnsStringRepresentationOfGame_WhenEntitiesDoNotShareSameCoordinate()
@@ -23,9 +24,9 @@ public class GameStateQueryTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = new Pac(new Coordinate(), Constants.PacStart),
+            Pac = new Pac(new Coordinate(), Constants.PacStart, It.IsAny<int>()),
             Ghosts = ghosts,
-            Walls = new Wall[] {new(new Coordinate(1, 1))}
+            Walls = new Wall[] {new(new Coordinate(1, 1))}.ToDictionary(k => k.Coordinate, v => v)
         };
 
         var expectedString = $"{Constants.PacStart}{Constants.Blank}{Constants.GreedyGhost}\n" +
@@ -51,9 +52,9 @@ public class GameStateQueryTests
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = new Pac(new Coordinate(), Constants.PacStart),
+            Pac = new Pac(new Coordinate(), Constants.PacStart, It.IsAny<int>()),
             Ghosts = ghosts,
-            Walls = new Wall[] {new(new Coordinate(1, 1))},
+            Walls = new Wall[] {new(new Coordinate(1, 1))}.ToDictionary(k => k.Coordinate, v => v),
             Pellets = pellets
         };
 

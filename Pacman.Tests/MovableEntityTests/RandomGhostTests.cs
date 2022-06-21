@@ -23,12 +23,12 @@ public class RandomGhostTests
     }
     
     [Fact]
-    public void PlayTurn_MovesGhostToRandomValidPosition_GivenNoObstacles()
+    public void Move_MovesGhostToRandomValidPosition_GivenNoObstacles()
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = new Size(3, 3),
-            Pac = new Pac(new Coordinate(), It.IsAny<char>()),
+            Pac = new Pac(new Coordinate(), It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(new Coordinate(1, 1), It.IsAny<char>(), _moveStrategy)},
         };
         var expectedPosCoords = new[]
@@ -42,48 +42,48 @@ public class RandomGhostTests
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
 
         _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
-        gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
 
         Assert.Equal(expectedPosCoords, actualPosCoords);
     }
     
     [Theory]
     [MemberData(nameof(WallsTestData))]
-    public void PlayTurn_MovesGhostToRandomValidPosition_GivenWalls(
+    public void Move_MovesGhostToRandomValidPosition_GivenWalls(
         Size size, Coordinate ghostCoord, IEnumerable<Wall> walls, IEnumerable<Coordinate> expectedPosCoords)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Pac = new Pac(new Coordinate(), It.IsAny<char>()),
+            Pac = new Pac(new Coordinate(), It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)},
-            Walls = walls
+            Walls = walls.ToDictionary(k => k.Coordinate, v => v)
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
         
         _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
-        gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
         Assert.Equal(expectedPosCoords, actualPosCoords);
     }
     
     [Theory]
     [MemberData(nameof(GhostsTestData))]
-    public void PlayTurn_MovesGhostToRandomValidPosition_GivenGhosts(
+    public void Move_MovesGhostToRandomValidPosition_GivenGhosts(
         Size size, Coordinate ghostCoord, IEnumerable<Ghost> ghosts, IEnumerable<Coordinate> expectedPosCoords)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = size,
-            Pac = new Pac(new Coordinate(), It.IsAny<char>()),
+            Pac = new Pac(new Coordinate(), It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)}.Concat(ghosts)
         };
         IEnumerable<Coordinate> actualPosCoords = Array.Empty<Coordinate>();
         var match = new CaptureMatch<IEnumerable<Coordinate>>(f => actualPosCoords = f);
         
         _mockSelector.Setup(_ => _.SelectFrom(Capture.With(match)));
-        gameState.Ghosts.First().PlayTurn(gameState);
+        gameState.Ghosts.First().Move(gameState);
         
         Assert.Equal(expectedPosCoords, actualPosCoords);
     }

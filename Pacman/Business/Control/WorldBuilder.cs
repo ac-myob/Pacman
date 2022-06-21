@@ -1,4 +1,5 @@
 using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Control.WorldLoader;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
@@ -19,9 +20,7 @@ public class WorldBuilder
     {
         var width = _world.GetLength(1);
         var length = _world.GetLength(0);
-        var pac = new Pac(GetPacCoord(_world, width, length), 
-            Constants.PacStart, Constants.PacStartingLives);
-        var worldEntities = new List<IEntity>{pac};
+        var worldEntities = new List<IEntity>();
 
         for (var l = 0; l < length; l++)
             for (var w = 0; w < width; w++)
@@ -35,6 +34,7 @@ public class WorldBuilder
                     Constants.RandomGhost => _ghostFactory.GetGhost(GhostType.Random, currentCoord),
                     Constants.GreedyGhost => _ghostFactory.GetGhost(GhostType.Greedy, currentCoord),
                     Constants.PathFindingGhost => _ghostFactory.GetGhost(GhostType.PathFinding, currentCoord),
+                    Constants.PacStart => new Pac(currentCoord, Constants.PacStart, Constants.PacStartingLives),
                     _ => null
                 };
 
@@ -43,15 +43,5 @@ public class WorldBuilder
             }
 
         return worldEntities;
-    }
-
-    private static Coordinate GetPacCoord(char[,] world, int width, int length)
-    {
-        for (var l = 0; l < length; l++)
-            for (var w = 0; w < width; w++)
-                if (world[l, w] == Constants.PacStart)
-                    return new Coordinate(w, l);
-
-        return new Coordinate();
     }
 }

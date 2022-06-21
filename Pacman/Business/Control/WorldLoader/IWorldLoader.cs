@@ -1,4 +1,4 @@
-namespace Pacman.Business.Control;
+namespace Pacman.Business.Control.WorldLoader;
 
 public interface IWorldLoader
 {

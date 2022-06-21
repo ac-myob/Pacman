@@ -1,5 +1,6 @@
 using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.Selector;
+using Pacman.Business.Control.WorldLoader;
 using Pacman.Business.Model;
 using Pacman.Variables;
 
@@ -8,7 +9,7 @@ namespace Pacman.Business.Control;
 public class GameService : IGameService
 {
     private readonly GameEngine _gameEngine;
-    public GameState GameState => _gameEngine.GameState;
+    private GameState GameState => _gameEngine.GameState;
 
     public GameService()
     {
@@ -21,4 +22,21 @@ public class GameService : IGameService
     public void PlayRound(Direction inputDirection) => _gameEngine.PlayRound(inputDirection);
     public void ResetRound() => _gameEngine.ResetRound();
     public void IncreaseRound() => _gameEngine.IncreaseRound();
+    public bool IsGameFinished() => GameState.GameStatus == GameStatus.GameComplete;
+
+    public bool IsRoundComplete() => GameState.GameStatus == GameStatus.RoundComplete;
+
+    public bool IsGameRunning() => GameState.GameStatus == GameStatus.Running;
+
+    public bool IsPacOnGhost() => GameState.GameStatus == GameStatus.Collided;
+
+    public bool IsDirectionValid(Direction inputDirection)
+    {
+        var currentPacCoord = GameState.Pac.Coordinate;
+        var newPacCoord = currentPacCoord.Shift(inputDirection, GameState.Size);
+
+        return !GameState.Walls.ContainsKey(newPacCoord);
+    }
+
+    public string GameMap() => Messages.GetTurnInfo(GameState) + GameState.GetString();
 }

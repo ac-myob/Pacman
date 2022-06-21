@@ -29,12 +29,4 @@ public static class GameStateExtensions
     
     public static IEnumerable<Pellet> GetPellets(this GameState gameState) =>
         gameState.Pellets.Where(p => !p.Eaten);
-    
-    public static bool IsDirectionValid(this GameState gameState, Direction direction)
-    {
-        var currentPacCoord = gameState.Pac.Coordinate;
-        var newPacCoord = currentPacCoord.Shift(direction, gameState.Size);
-
-        return !gameState.Walls.ContainsKey(newPacCoord);
-    }
 }

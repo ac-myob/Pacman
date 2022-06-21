@@ -15,52 +15,52 @@ public class GreedyGhostTests
     
     [Theory]
     [MemberData(nameof(NoObstaclesTestData))]
-    public void PlayTurn_MovesGhostToMinimallyDistantPositionFromPac_GivenNoObstacles(
+    public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenNoObstacles(
         Size mapSize, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = new Pac(pacCoord, It.IsAny<char>()),
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), _moveStrategy)}
         };
 
-        gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
     [MemberData(nameof(WallsTestData))]
-    public void PlayTurn_MovesGhostToMinimallyDistantPositionFromPac_GivenWalls(
+    public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenWalls(
         Size mapSize, IEnumerable<Wall> walls, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = new Pac(pacCoord, It.IsAny<char>()),
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), new GreedyMoveStrategy())},
-            Walls = walls
+            Walls = walls.ToDictionary(k => k.Coordinate, v => v)
         };
         
-        gameState.Ghosts.Single().PlayTurn(gameState);
+        gameState.Ghosts.Single().Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Ghosts.Single().Coordinate);
     }
     
     [Theory]
     [MemberData(nameof(GhostsTestData))]
-    public void PlayTurn_MovesGhostToMinimallyDistantPositionFromPac_GivenOtherGhosts(
+    public void Move_MovesGhostToMinimallyDistantPositionFromPac_GivenOtherGhosts(
         Size mapSize, IList<Ghost> ghosts, Coordinate ghostCoord, Coordinate pacCoord, Coordinate expectedCoord)
     {
         var gameState = TestHelper.GetGameState() with
         {
             Size = mapSize,
-            Pac = new Pac(pacCoord, It.IsAny<char>()),
+            Pac = new Pac(pacCoord, It.IsAny<char>(), It.IsAny<int>()),
             Ghosts = new[] {new Ghost(ghostCoord, It.IsAny<char>(), new GreedyMoveStrategy())}.Concat(ghosts)
         };
         
-        gameState.Ghosts.First().PlayTurn(gameState);
+        gameState.Ghosts.First().Move(gameState);
         
         Assert.Equal(expectedCoord, gameState.Ghosts.First().Coordinate);
     }
