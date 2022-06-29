@@ -36,7 +36,16 @@ public class GameEngine
             
             switch (entity.Symbol)
             {
-                case Constants.Wall:
+                case Constants.WallHorz:
+                case Constants.WallVert:
+                case Constants.WallBottomLeft:
+                case Constants.WallBottomRight:
+                case Constants.WallTopLeft:
+                case Constants.WallTopRight:
+                case Constants.WallTLeft:
+                case Constants.WallTRight:
+                case Constants.WallTDown:
+                case Constants.WallTUp:
                     _walls.Add(entity.Coordinate, (Wall) entity);
                     break;
                 case Constants.Pellet:

@@ -28,7 +28,16 @@ public class WorldBuilder
                 var currentCoord = new Coordinate(w, l);
                 IEntity? currentEntity = _world[l, w] switch
                 {
-                    Constants.Wall => new Wall(currentCoord),
+                    Constants.WallHorz => new Wall(currentCoord, Constants.WallHorz),
+                    Constants.WallVert => new Wall(currentCoord, Constants.WallVert),
+                    Constants.WallBottomLeft => new Wall(currentCoord, Constants.WallBottomLeft),
+                    Constants.WallBottomRight => new Wall(currentCoord, Constants.WallBottomRight),
+                    Constants.WallTopLeft => new Wall(currentCoord, Constants.WallTopLeft),
+                    Constants.WallTopRight => new Wall(currentCoord, Constants.WallTopRight),
+                    Constants.WallTUp => new Wall(currentCoord, Constants.WallTUp),
+                    Constants.WallTDown => new Wall(currentCoord, Constants.WallTDown),
+                    Constants.WallTLeft => new Wall(currentCoord, Constants.WallTLeft),
+                    Constants.WallTRight => new Wall(currentCoord, Constants.WallTRight),
                     Constants.Pellet => new Pellet(currentCoord, Constants.Pellet),
                     Constants.MagicPellet => new Pellet(currentCoord, Constants.MagicPellet),
                     Constants.RandomGhost => _ghostFactory.GetGhost(GhostType.Random, currentCoord),

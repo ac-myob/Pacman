@@ -94,7 +94,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new Wall[] {new(new Coordinate(1, 0))},
+            new Wall[] {new(new Coordinate(1, 0), It.IsAny<char>())},
             new Coordinate[] {new(1, 2), new(2, 1), new(0, 1)}
         };
         
@@ -102,7 +102,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new Wall[] {new(new Coordinate(2, 1))},
+            new Wall[] {new(new Coordinate(2, 1), It.IsAny<char>())},
             new Coordinate[] {new(1, 0), new(1, 2), new(0, 1)}
         };
         
@@ -110,7 +110,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new Wall[] {new(new Coordinate(1, 2))},
+            new Wall[] {new(new Coordinate(1, 2), It.IsAny<char>())},
             new Coordinate[] {new(1, 0), new(2, 1), new(0, 1)}
         };
         
@@ -118,7 +118,7 @@ public class RandomGhostTests
         {
             new Size(3, 3),
             new Coordinate(1, 1),
-            new Wall[] {new(new Coordinate(0, 1))},
+            new Wall[] {new(new Coordinate(0, 1), It.IsAny<char>())},
             new Coordinate[] {new(1, 0), new(1, 2), new(2, 1)}
         };
     }

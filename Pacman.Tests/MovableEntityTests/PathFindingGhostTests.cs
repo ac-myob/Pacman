@@ -80,7 +80,7 @@ public class PathFindingGhostTests
         yield return new object[]
         {
             new Size(4, 4),
-            new Wall[] {new(new Coordinate(2, 1))},
+            new Wall[] {new(new Coordinate(2, 1), It.IsAny<char>())},
             new Coordinate(1, 1), 
             new Coordinate(3, 1), 
             new Coordinate(0, 1)
@@ -89,7 +89,7 @@ public class PathFindingGhostTests
         yield return new object[]
         {
             new Size(4, 4),
-            new Wall[] {new(new Coordinate(1, 2))},
+            new Wall[] {new(new Coordinate(1, 2), It.IsAny<char>())},
             new Coordinate(1, 1), 
             new Coordinate(3, 3), 
             new Coordinate(1, 0)
@@ -100,10 +100,10 @@ public class PathFindingGhostTests
             new Size(4, 4),
             new Wall[]
             {
-                new(new Coordinate(1, 0)), 
-                new(new Coordinate(1, 2)), 
-                new(new Coordinate(0, 1)),
-                new(new Coordinate(2, 1))
+                new(new Coordinate(1, 0), It.IsAny<char>()), 
+                new(new Coordinate(1, 2), It.IsAny<char>()), 
+                new(new Coordinate(0, 1), It.IsAny<char>()),
+                new(new Coordinate(2, 1), It.IsAny<char>())
             },
             new Coordinate(1, 1), 
             new Coordinate(3, 3), 

@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using Moq;
 using Pacman.Business.Control;
@@ -28,8 +27,8 @@ public class WorldBuilderTests
             new[,] {
                 {'·', '·', '·'},
                 {'X', 'X', '◯'},
-                {'ᗣ', 'ᓆ', '▩'},
-                {'▩', 'ᔬ', 'X'}
+                {'ᗣ', 'ᓆ', '═'},
+                {'═', 'ᔬ', 'X'}
             });
 
         var worldBuilder = new WorldBuilder(_worldLoader.Object, new GhostFactory(new RandomSelector<Coordinate>()));
@@ -52,8 +51,8 @@ public class WorldBuilderTests
             new[,] {
                 {'·', '·', '·'},
                 {'X', 'X', '◯'},
-                {'ᗣ', 'ᓆ', '▩'},
-                {'▩', 'ᔬ', 'X'}
+                {'ᗣ', 'ᓆ', '═'},
+                {'═', 'ᔬ', 'X'}
             });
         
         var worldBuilder = new WorldBuilder(_worldLoader.Object, new GhostFactory(new RandomSelector<Coordinate>()));

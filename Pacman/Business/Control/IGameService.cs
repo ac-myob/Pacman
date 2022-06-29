@@ -1,4 +1,3 @@
-using Pacman.Business.Model;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;

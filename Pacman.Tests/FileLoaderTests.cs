@@ -1,4 +1,3 @@
-using Pacman.Business.Control;
 using Pacman.Business.Control.WorldLoader;
 using Pacman.Exceptions;
 using Xunit;
@@ -42,7 +41,7 @@ public class FileLoaderTests
             {'·', '·', '✪'},
             {'X', '·', '◯'},
             {'ᗣ', 'ᓆ', 'X'},
-            {'▩', 'ᔬ', 'X'}
+            {'═', 'ᔬ', 'X'}
         };
 
         var actualArray = fileLoad.LoadWorld();
