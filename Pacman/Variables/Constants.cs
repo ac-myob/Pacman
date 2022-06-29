@@ -7,7 +7,16 @@ public static class Constants
     public const string LeftKey = "LeftArrow";
     public const string RightKey = "RightArrow";
     public const string ValidKeysRegex = $"^({UpKey}|{DownKey}|{LeftKey}|{RightKey})$";
-    public const char Wall = '▩';
+    public const char WallVert = '║';
+    public const char WallHorz = '═';
+    public const char WallTopLeft = '╔';
+    public const char WallTopRight = '╗';
+    public const char WallBottomLeft = '╚';
+    public const char WallBottomRight = '╝';
+    public const char WallTUp = '╦';
+    public const char WallTDown = '╩';
+    public const char WallTLeft = '╣';
+    public const char WallTRight = '╠';
     public const char Pellet = '·';
     public const char MagicPellet = '✪';
     public const char GreedyGhost = 'ᗣ';
@@ -27,6 +36,5 @@ public static class Constants
     public const int PacStartingLives = 6;
     public const int StartRound = 1;
     public const int MaxRounds = 4;
-    public const int StartingId = 0;
     public const int PowerUpTurns = 10;
 }

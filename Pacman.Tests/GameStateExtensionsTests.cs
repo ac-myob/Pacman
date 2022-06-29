@@ -26,11 +26,11 @@ public class GameStateExtensionsTests
             Size = new Size(3, 3),
             Pac = new Pac(new Coordinate(), Constants.PacStart, It.IsAny<int>()),
             Ghosts = ghosts,
-            Walls = new Wall[] {new(new Coordinate(1, 1))}.ToDictionary(k => k.Coordinate, v => v)
+            Walls = new Wall[] {new(new Coordinate(1, 1), Constants.WallHorz)}.ToDictionary(k => k.Coordinate, v => v)
         };
 
         var expectedString = $"{Constants.PacStart}{Constants.Blank}{Constants.GreedyGhost}\n" +
-                             $"{Constants.Blank}{Constants.Wall}{Constants.Blank}\n" +
+                             $"{Constants.Blank}{Constants.WallHorz}{Constants.Blank}\n" +
                              $"{Constants.RandomGhost}{Constants.Blank}{Constants.PathFindingGhost}\n";
         
         Assert.Equal(expectedString, gameState.GetString());
@@ -54,12 +54,12 @@ public class GameStateExtensionsTests
             Size = new Size(3, 3),
             Pac = new Pac(new Coordinate(), Constants.PacStart, It.IsAny<int>()),
             Ghosts = ghosts,
-            Walls = new Wall[] {new(new Coordinate(1, 1))}.ToDictionary(k => k.Coordinate, v => v),
+            Walls = new Wall[] {new(new Coordinate(1, 1), Constants.WallHorz)}.ToDictionary(k => k.Coordinate, v => v),
             Pellets = pellets
         };
 
         var expectedString = $"{Constants.PacStart}{Constants.Pellet}{Constants.GreedyGhost}\n" +
-                             $"{Constants.Pellet}{Constants.Wall}{Constants.Pellet}\n" +
+                             $"{Constants.Pellet}{Constants.WallHorz}{Constants.Pellet}\n" +
                              $"{Constants.RandomGhost}{Constants.Pellet}{Constants.PathFindingGhost}\n";
         
         Assert.Equal(expectedString, gameState.GetString());
