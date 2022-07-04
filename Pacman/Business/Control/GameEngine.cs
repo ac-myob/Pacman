@@ -1,7 +1,7 @@
-using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Control.Sequence;
 using Pacman.Business.Model;
+using Pacman.Business.Model.Ghosts;
 using Pacman.Variables;
 
 namespace Pacman.Business.Control;

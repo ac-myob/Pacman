@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Model;
+using Pacman.Business.Model.Ghosts;
 using Xunit;
 
 namespace Pacman.Tests.MovableEntityTests;

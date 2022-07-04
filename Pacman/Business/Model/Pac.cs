@@ -1,7 +1,7 @@
-using Pacman.Business.Model;
+using Pacman.Business.Control;
 using Pacman.Variables;
 
-namespace Pacman.Business.Control;
+namespace Pacman.Business.Model;
 
 public class Pac : IMovable, IResetable
 {
@@ -13,7 +13,6 @@ public class Pac : IMovable, IResetable
     public Coordinate Coordinate { get; private set; }
     public char Symbol { get; private set; }
     public int Lives { get; private set; }
-
     public int PowerUp { get; private set; }
 
     public Pac(Coordinate coordinate, char symbol, int lives)

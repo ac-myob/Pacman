@@ -1,8 +1,7 @@
 using Pacman.Business.Control.MoveStrategies;
-using Pacman.Business.Model;
 using Pacman.Variables;
 
-namespace Pacman.Business.Control.Ghosts;
+namespace Pacman.Business.Model.Ghosts;
 
 public class Ghost : IMovable, IResetable
 {

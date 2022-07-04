@@ -1,5 +1,5 @@
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
+using Pacman.Business.Model.Ghosts;
 using Pacman.Variables;
 
 namespace Pacman.Business.Model;

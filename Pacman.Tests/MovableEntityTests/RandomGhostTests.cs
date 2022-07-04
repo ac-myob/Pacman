@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Control.MoveStrategies;
 using Pacman.Business.Control.Selector;
 using Pacman.Business.Model;
+using Pacman.Business.Model.Ghosts;
 using Xunit;
 using Capture = Moq.Capture;
 

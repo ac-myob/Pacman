@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using Moq;
 using Pacman.Business.Control;
-using Pacman.Business.Control.Ghosts;
 using Pacman.Business.Model;
+using Pacman.Business.Model.Ghosts;
 using Pacman.Variables;
 
 namespace Pacman.Tests;
